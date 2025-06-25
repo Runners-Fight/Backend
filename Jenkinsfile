@@ -36,7 +36,9 @@ pipeline {
         always {
             junit 'build/test-results/test/*.xml'
 
-            recordCoverage(
+            recordIssues(
+                id: 'coverage',
+                name: 'Code Coverage',
                 tools: [[
                     parser: 'JACOCO',
                     pattern: 'build/reports/jacoco/test/jacocoTestReport.xml'
