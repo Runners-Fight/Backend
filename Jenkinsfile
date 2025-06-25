@@ -40,7 +40,7 @@ pipeline {
                 id: 'coverage',
                 name: 'Code Coverage',
                 tools: [[
-                    parser: 'JACOCO',
+                    $class: 'JacocoAdapter',
                     pattern: 'build/reports/jacoco/test/jacocoTestReport.xml'
                 ]]
             )
