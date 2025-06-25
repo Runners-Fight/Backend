@@ -39,8 +39,7 @@ pipeline {
             recordIssues(
                 tools: [
                     jacoco(pattern: 'build/reports/jacoco/test/jacocoTestReport.xml')
-                ],
-                analysisModel: [failOnError: false, ignoreQualityGate: true]
+                ]
             )
         }
     }
