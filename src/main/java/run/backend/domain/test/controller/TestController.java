@@ -1,22 +1,23 @@
-package run.backend.domain.crew.controller;
+package run.backend.domain.test.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.hibernate.annotations.Parameter;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import run.backend.domain.test.service.TestService;
 
 @RestController
 @RequestMapping("/test")
 @RequiredArgsConstructor
 public class TestController {
 
-    @GetMapping("/hello")
-    public String testCode(){
-        System.out.println("Hello World!!");
-        return "test";
+    private final TestService testService;
+
+    @GetMapping("/hello/{number}")
+    public String testCoverage(@PathVariable int number) {
+
+
+        return testService.testCoverage(number);
     }
 }
