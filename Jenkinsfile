@@ -36,9 +36,11 @@ pipeline {
         always {
             junit 'build/test-results/test/*.xml'
 
-            tools: [
-                jacoco(pattern: 'build/reports/jacoco/test/jacocoTestReport.xml', name: 'JaCoCo Coverage')
-            ]
+            recordIssues(
+                tools: [
+                    jacoco(pattern: 'build/reports/jacoco/test/jacocoTestReport.xml', name: 'JaCoCo Coverage')
+                ]
+            )
         }
     }
 }
