@@ -40,7 +40,6 @@ pipeline {
                 tools: [
                     jacoco(pattern: 'build/reports/jacoco/test/jacocoTestReport.xml', name: 'JaCoCo Coverage')
                 ]
-                publishChecks: true
             )
         }
     }
