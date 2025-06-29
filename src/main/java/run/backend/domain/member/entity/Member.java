@@ -12,8 +12,9 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import run.backend.domain.member.domain.Gender;
-import run.backend.domain.member.domain.OAuthType;
+import run.backend.domain.member.enums.Gender;
+import run.backend.domain.member.enums.OAuthType;
+import run.backend.domain.member.enums.Role;
 
 @Entity
 @Getter
@@ -39,6 +40,9 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private OAuthType oauthType;
 
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
     private String profileImage;
 
     private boolean pushEnabled;
@@ -50,7 +54,7 @@ public class Member {
     private LocalDateTime deletedAt;
 
     @Builder
-    public Member(String username, String nickname, Gender gender, int age, String oauthId, OAuthType oauthType, String profileImage) {
+    public Member(String username, String nickname, Gender gender, int age, String oauthId, OAuthType oauthType, String profileImage, Role role) {
         this.username = username;
         this.nickname = nickname;
         this.gender = gender;
@@ -59,6 +63,7 @@ public class Member {
         this.oauthType = oauthType;
         this.profileImage = profileImage;
         this.pushEnabled = true;
+        this.role = Role.USER;
         this.createdAt = LocalDateTime.now();
     }
 }
