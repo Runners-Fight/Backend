@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import run.backend.domain.member.entity.Member;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
-    Optional<Member> findByEmail(String email);
+    Optional<Member> findByOauthId(String oauthId);
 }
