@@ -76,6 +76,9 @@ class AuthServiceTest {
     @Mock
     private ObjectMapper objectMapper;
 
+    @Mock
+    private run.backend.domain.file.service.FileService fileService;
+
     @InjectMocks
     private AuthService authService;
 
@@ -273,8 +276,7 @@ class AuthServiceTest {
                     signupToken,
                     "테스트 닉네임",
                     Gender.MALE,
-                    25,
-                    "profile-image-url"
+                    25
             );
 
             Claims claims = createMockClaims("123456789", "google", "test@example.com", "테스트 유저");
@@ -286,7 +288,7 @@ class AuthServiceTest {
             given(jwtTokenProvider.generateToken(any())).willReturn(tokenResponse);
 
             // when
-            TokenResponse result = authService.completeSignup(signupRequest);
+            TokenResponse result = authService.completeSignup(signupRequest, null);
 
             // then
             assertThat(result).isEqualTo(tokenResponse);
@@ -315,13 +317,12 @@ class AuthServiceTest {
                     invalidToken,
                     "테스트 닉네임",
                     Gender.MALE,
-                    25,
-                    "profile-image-url"
+                    25
             );
 
             given(jwtTokenProvider.validateToken(invalidToken)).willReturn(false);
 
-            assertThatThrownBy(() -> authService.completeSignup(signupRequest))
+            assertThatThrownBy(() -> authService.completeSignup(signupRequest, null))
                     .isInstanceOf(ApplicationException.class)
                     .hasFieldOrPropertyWithValue("exceptionCode", ExceptionCode.INVALID_SIGNUP_TOKEN);
 
@@ -339,8 +340,7 @@ class AuthServiceTest {
                     signupToken,
                     "테스트 닉네임",
                     Gender.MALE,
-                    25,
-                    "profile-image-url"
+                    25
             );
 
             Claims claims = createMockClaims("123456789", "google", "test@example.com", "테스트 유저");
@@ -350,7 +350,7 @@ class AuthServiceTest {
             given(memberRepository.findByOauthId("123456789")).willReturn(Optional.of(existingMember));
 
             // when & then
-            assertThatThrownBy(() -> authService.completeSignup(signupRequest))
+            assertThatThrownBy(() -> authService.completeSignup(signupRequest, null))
                     .isInstanceOf(ApplicationException.class)
                     .hasFieldOrPropertyWithValue("exceptionCode", ExceptionCode.USER_ALREADY_EXISTS);
 
@@ -389,14 +389,13 @@ class AuthServiceTest {
                     null,
                     "테스트 닉네임",
                     Gender.MALE,
-                    25,
-                    "profile-url"
+                    25
             );
 
             given(jwtTokenProvider.validateToken(null)).willReturn(false);
 
             // when & then
-            assertThatThrownBy(() -> authService.completeSignup(signupRequest))
+            assertThatThrownBy(() -> authService.completeSignup(signupRequest, null))
                     .isInstanceOf(ApplicationException.class)
                     .hasFieldOrPropertyWithValue("exceptionCode", ExceptionCode.INVALID_SIGNUP_TOKEN);
         }
@@ -442,8 +441,7 @@ class AuthServiceTest {
                         signupToken,
                         "CompletedUser",
                         Gender.MALE,
-                        25,
-                        "profile-image-url"
+                        25
                 );
 
                 Claims claims = createMockClaims("123456789", "google", "test@example.com", "테스트 유저");
@@ -455,7 +453,7 @@ class AuthServiceTest {
                 given(jwtTokenProvider.generateToken(any())).willReturn(tokenResponse);
 
                 // when
-                TokenResponse completeSignupResult = authService.completeSignup(signupRequest);
+                TokenResponse completeSignupResult = authService.completeSignup(signupRequest, null);
 
                 // then
                 assertThat(completeSignupResult).isEqualTo(tokenResponse);

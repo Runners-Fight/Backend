@@ -21,7 +21,15 @@ public enum ExceptionCode {
     TOKEN_MISSING_AUTHORITY(HttpStatus.UNAUTHORIZED, 4004, "토큰에 권한 정보가 없습니다."),
     INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, 4005, "유효하지 않은 리프레시 토큰입니다."),
     REFRESH_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, 4006, "리프레시 토큰을 찾을 수 없습니다."),
-    REFRESH_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, 4007, "리프레시 토큰이 만료되었습니다.");
+    REFRESH_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, 4007, "리프레시 토큰이 만료되었습니다."),
+
+    // 5000: File Error
+    FILE_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 5001, "파일 업로드에 실패했습니다."),
+    FILE_SIZE_EXCEEDED(HttpStatus.BAD_REQUEST, 5002, "파일 크기가 10MB를 초과합니다."),
+    INVALID_FILE_NAME(HttpStatus.BAD_REQUEST, 5003, "유효하지 않은 파일명입니다."),
+    INVALID_FILE_EXTENSION(HttpStatus.BAD_REQUEST, 5004, "지원하지 않는 파일 형식입니다. (jpg, jpeg, png, gif만 허용)"),
+    INVALID_FILE_TYPE(HttpStatus.BAD_REQUEST, 5005, "이미지 파일만 업로드 가능합니다."),
+    FILE_NOT_FOUND(HttpStatus.NOT_FOUND, 5006, "파일을 찾을 수 없습니다.");
 
     private final HttpStatus httpStatus;
     private final int code;

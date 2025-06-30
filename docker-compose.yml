@@ -17,6 +17,7 @@ services:
       - "8080:8080"
     volumes:
       - ./app.jar:/app/app.jar
+      - ./uploads:/app/uploads
     depends_on:
       - db
     restart: unless-stopped

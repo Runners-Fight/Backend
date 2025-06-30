@@ -7,7 +7,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import run.backend.domain.auth.dto.request.CodeRequest;
 import run.backend.domain.auth.dto.request.SignupRequest;
 import run.backend.domain.auth.dto.response.SignupResponse;
@@ -33,9 +35,10 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<CommonResponse<TokenResponse>> signup(
-        @RequestBody SignupRequest signupRequest) {
+        @RequestPart("signupRequest") SignupRequest signupRequest,
+        @RequestPart(value = "profileImage", required = false) MultipartFile profileImage) {
 
-        TokenResponse response = authService.completeSignup(signupRequest);
+        TokenResponse response = authService.completeSignup(signupRequest, profileImage);
 
         return ResponseEntity.ok(new CommonResponse<>("회원가입이 완료되었습니다.", response));
     }

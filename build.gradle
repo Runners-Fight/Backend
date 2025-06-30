@@ -63,7 +63,8 @@ jacocoTestReport {
 				files(classDirectories.files.collect {
 					fileTree(dir: it, exclude: [
 							'**/Q*.class',
-							'**/run/backend/BackendApplication.class'
+							'**/run/backend/BackendApplication.class',
+							'**/run/backend/global/**'
 					])
 				})
 		)

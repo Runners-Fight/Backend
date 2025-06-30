@@ -1,16 +1,28 @@
 spring:
   config:
     import: optional:file:.env[.properties]
+
   datasource:
     url: jdbc:postgresql://${POSTGRES_HOST}:5432/${POSTGRES_DB}
     username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
+  web:
+    resources:
+      static-locations:
+        - classpath:/static/
+        - file:${file.upload.dir}/
+
   jpa:
     database: postgresql
     hibernate:
       ddl-auto: create
+  
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
 
   security:
     oauth2:
@@ -26,3 +38,7 @@ jwt:
   secret: ${JWT_SECRET}
   access-token-expire-time: 1800000    # 30분
   refresh-token-expire-time: 1209600000 # 2주
+
+file:
+  upload:
+    dir: ${user.home}/${UPLOAD_DIR}

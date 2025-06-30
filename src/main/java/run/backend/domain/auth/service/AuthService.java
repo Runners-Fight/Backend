@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 import run.backend.domain.auth.dto.request.SignupRequest;
 import run.backend.domain.auth.dto.response.SignupResponse;
 import run.backend.domain.auth.dto.response.TokenResponse;
@@ -34,6 +35,7 @@ import run.backend.global.oauth2.OAuth2UserInfo;
 import run.backend.global.oauth2.OAuth2UserInfoFactory;
 import run.backend.global.security.CustomUserDetails;
 import run.backend.global.util.JwtTokenProvider;
+import run.backend.domain.file.service.FileService;
 
 @Service
 @Transactional
@@ -44,6 +46,7 @@ public class AuthService {
     private final ClientRegistrationRepository clientRegistrationRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final FileService fileService;
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -71,7 +74,7 @@ public class AuthService {
             });
     }
 
-    public TokenResponse completeSignup(SignupRequest signupRequest) {
+    public TokenResponse completeSignup(SignupRequest signupRequest, MultipartFile profileImage) {
         if (!jwtTokenProvider.validateToken(signupRequest.signupToken())) {
             throw new ApplicationException(ExceptionCode.INVALID_SIGNUP_TOKEN);
         }
@@ -86,6 +89,8 @@ public class AuthService {
             throw new ApplicationException(ExceptionCode.USER_ALREADY_EXISTS);
         });
 
+        String profileImageName = fileService.saveProfileImage(profileImage);
+
         Member newMember = Member.builder()
             .username(name)
             .nickname(signupRequest.nickname())
@@ -94,6 +99,7 @@ public class AuthService {
             .oauthId(oauthId)
             .oauthType(OAuthType.valueOf(providerName.toUpperCase()))
             .role(Role.USER)
+            .profileImage(profileImageName)
             .build();
         memberRepository.save(newMember);
 
