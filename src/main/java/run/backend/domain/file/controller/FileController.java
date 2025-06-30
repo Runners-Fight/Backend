@@ -17,7 +17,7 @@ import java.time.Duration;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/files")
+@RequestMapping("/api/v1/files")
 @RequiredArgsConstructor
 public class FileController {
 

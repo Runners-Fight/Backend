@@ -33,7 +33,7 @@ public class SecurityConfig {
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         http.authorizeHttpRequests(
-            authorize -> authorize.requestMatchers("/api/auth/**").permitAll().anyRequest()
+            authorize -> authorize.requestMatchers("/api/v1/auth/**").permitAll().anyRequest()
                 .authenticated());
 
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()));

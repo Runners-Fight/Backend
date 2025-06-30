@@ -18,7 +18,7 @@ import run.backend.domain.auth.service.AuthService;
 import run.backend.global.common.response.CommonResponse;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
