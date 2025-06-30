@@ -10,10 +10,12 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.never;
 import static org.mockito.BDDMockito.times;
 import static org.mockito.BDDMockito.verify;
+import static org.mockito.Mockito.lenient;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -39,6 +41,7 @@ import org.springframework.web.client.RestTemplate;
 import run.backend.domain.auth.dto.request.SignupRequest;
 import run.backend.domain.auth.dto.response.SignupResponse;
 import run.backend.domain.auth.dto.response.TokenResponse;
+import run.backend.domain.auth.repository.RefreshTokenRepository;
 import run.backend.domain.member.entity.Member;
 import run.backend.domain.member.enums.Gender;
 import run.backend.domain.member.enums.OAuthType;
@@ -57,6 +60,9 @@ class AuthServiceTest {
 
     @Mock
     private MemberRepository memberRepository;
+
+    @Mock
+    private RefreshTokenRepository refreshTokenRepository;
 
     @Mock
     private ClientRegistrationRepository clientRegistrationRepository;
@@ -82,6 +88,9 @@ class AuthServiceTest {
     void setUp() throws Exception {
         ReflectionTestUtils.setField(authService, "restTemplate", restTemplate);
         ReflectionTestUtils.setField(authService, "objectMapper", objectMapper);
+
+        lenient().when(jwtTokenProvider.getRefreshTokenExpiresAt(anyString()))
+            .thenReturn(LocalDateTime.now().plusDays(14));
 
         clientRegistration = ClientRegistration.withRegistrationId("google")
                 .clientId("test-client-id")
