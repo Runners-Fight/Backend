@@ -9,6 +9,8 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import java.security.Key;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -119,5 +121,17 @@ public class JwtTokenProvider {
             .setExpiration(new Date(now + 600000))
             .signWith(key, SignatureAlgorithm.HS256)
             .compact();
+    }
+
+    public LocalDateTime getRefreshTokenExpiresAt(String refreshToken) {
+        try {
+            Claims claims = parseClaims(refreshToken);
+            Date expiration = claims.getExpiration();
+            return expiration.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+        } catch (Exception e) {
+            return LocalDateTime.now().plusSeconds(refreshTokenExpireTime / 1000);
+        }
     }
 }

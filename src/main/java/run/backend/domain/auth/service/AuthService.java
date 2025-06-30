@@ -22,6 +22,8 @@ import org.springframework.web.client.RestTemplate;
 import run.backend.domain.auth.dto.request.SignupRequest;
 import run.backend.domain.auth.dto.response.SignupResponse;
 import run.backend.domain.auth.dto.response.TokenResponse;
+import run.backend.domain.auth.entity.RefreshToken;
+import run.backend.domain.auth.repository.RefreshTokenRepository;
 import run.backend.domain.member.entity.Member;
 import run.backend.domain.member.enums.OAuthType;
 import run.backend.domain.member.enums.Role;
@@ -40,6 +42,7 @@ public class AuthService {
 
     private final MemberRepository memberRepository;
     private final ClientRegistrationRepository clientRegistrationRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -54,6 +57,7 @@ public class AuthService {
             .map(member -> {
                 Authentication authentication = createAuthentication(member, userAttributes);
                 TokenResponse tokens = jwtTokenProvider.generateToken(authentication);
+                saveRefreshToken(tokens.refreshToken(), member);
                 return SignupResponse.forExistingUser(tokens);
             })
             .orElseGet(() -> {
@@ -94,7 +98,10 @@ public class AuthService {
         memberRepository.save(newMember);
 
         Authentication authentication = createAuthentication(newMember, null);
-        return jwtTokenProvider.generateToken(authentication);
+        TokenResponse tokens = jwtTokenProvider.generateToken(authentication);
+        saveRefreshToken(tokens.refreshToken(), newMember);
+
+        return tokens;
     }
 
     private Authentication createAuthentication(Member member, Map<String, Object> attributes) {
@@ -129,5 +136,47 @@ public class AuthService {
             ResponseEntity<String> response = restTemplate.exchange(userInfoUri, HttpMethod.GET, request, String.class);
             return objectMapper.readValue(response.getBody(), new TypeReference<>() {});
         } catch (Exception e) { throw new ApplicationException(ExceptionCode.OAUTH_REQUEST_FAILED); }
+    }
+
+    public TokenResponse refreshTokens(String authorizationCode) {
+        String refreshToken = extractTokenFromHeader(authorizationCode);
+
+        if (!jwtTokenProvider.validateToken(refreshToken)) {
+            throw new ApplicationException(ExceptionCode.INVALID_REFRESH_TOKEN);
+        }
+
+        RefreshToken refreshTokenEntity = refreshTokenRepository.findByToken(refreshToken)
+            .orElseThrow(() -> new ApplicationException(ExceptionCode.REFRESH_TOKEN_NOT_FOUND));
+
+        if (refreshTokenEntity.isExpired()) {
+            throw new ApplicationException(ExceptionCode.REFRESH_TOKEN_EXPIRED);
+        }
+
+        Member member = refreshTokenEntity.getMember();
+
+        Authentication authentication = createAuthentication(member, null);
+        TokenResponse newTokens = jwtTokenProvider.generateToken(authentication);
+
+        saveRefreshToken(newTokens.refreshToken(), member);
+
+        return newTokens;
+    }
+
+    private void saveRefreshToken(String refreshToken, Member member) {
+        refreshTokenRepository.deleteByMember(member);
+
+        RefreshToken refreshTokenEntity = RefreshToken.builder()
+            .token(refreshToken)
+            .member(member)
+            .expiresAt(jwtTokenProvider.getRefreshTokenExpiresAt(refreshToken))
+            .build();
+        refreshTokenRepository.save(refreshTokenEntity);
+    }
+
+    private String extractTokenFromHeader(String authorizationHeader) {
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            throw new ApplicationException(ExceptionCode.INVALID_REFRESH_TOKEN);
+        }
+        return authorizationHeader.substring(7);
     }
 }
