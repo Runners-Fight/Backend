@@ -1,4 +1,4 @@
-가package run.backend.global.common;
+package run.backend.global.common;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
