@@ -2,7 +2,7 @@ package run.backend.domain.crew.service;
 
 import run.backend.domain.crew.dto.request.CrewInfoRequest;
 import run.backend.domain.crew.dto.response.*;
-import run.backend.domain.crew.enumerate.CrewMemberRole;
+import run.backend.domain.member.enums.Role;
 
 import java.time.YearMonth;
 
@@ -20,7 +20,7 @@ public interface CrewService {
 
     CrewMemberResponse getCrewMemberProfile(Long crewId);
 
-    void updateCrewMemberRole(Long memberId, CrewMemberRole crewMemberRole);
+    void updateCrewMemberRole(Long memberId, Role role);
 
     CrewSearchResponse getRankCrew();
 }
