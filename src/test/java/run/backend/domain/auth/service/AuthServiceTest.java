@@ -119,7 +119,6 @@ class AuthServiceTest {
                 .age(25)
                 .oauthId("123456789")
                 .oauthType(OAuthType.GOOGLE)
-                .role(Role.USER)
                 .build();
 
         tokenResponse = new TokenResponse("access-token", "refresh-token");
@@ -302,7 +301,7 @@ class AuthServiceTest {
                     member.getAge() == 25 &&
                     member.getOauthId().equals("123456789") &&
                     member.getOauthType().equals(OAuthType.GOOGLE) &&
-                    member.getRole().equals(Role.USER) &&
+                    member.getRole().equals(Role.NONE) &&
                     member.getUsername().equals("테스트 유저")
             ));
             verify(jwtTokenProvider).generateToken(any());

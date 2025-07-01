@@ -98,7 +98,6 @@ public class AuthService {
             .age(signupRequest.age())
             .oauthId(oauthId)
             .oauthType(OAuthType.valueOf(providerName.toUpperCase()))
-            .role(Role.USER)
             .profileImage(profileImageName)
             .build();
         memberRepository.save(newMember);

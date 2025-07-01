@@ -7,7 +7,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,12 +14,13 @@ import lombok.NoArgsConstructor;
 import run.backend.domain.member.enums.Gender;
 import run.backend.domain.member.enums.OAuthType;
 import run.backend.domain.member.enums.Role;
+import run.backend.global.common.BaseEntity;
 
 @Entity
 @Getter
 @Table(name = "members")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Member {
+public class Member extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,14 +47,8 @@ public class Member {
 
     private boolean pushEnabled;
 
-    private LocalDateTime createdAt;
-
-    private LocalDateTime updatedAt;
-
-    private LocalDateTime deletedAt;
-
     @Builder
-    public Member(String username, String nickname, Gender gender, int age, String oauthId, OAuthType oauthType, String profileImage, Role role) {
+    public Member(String username, String nickname, Gender gender, int age, String oauthId, OAuthType oauthType, String profileImage) {
         this.username = username;
         this.nickname = nickname;
         this.gender = gender;
@@ -63,7 +57,6 @@ public class Member {
         this.oauthType = oauthType;
         this.profileImage = profileImage;
         this.pushEnabled = true;
-        this.role = Role.USER;
-        this.createdAt = LocalDateTime.now();
+        this.role = Role.NONE;
     }
 }
