@@ -43,3 +43,4 @@ secrets.yml
 .idea
 .env
 src/test/resources/application.yml
+/uploads
