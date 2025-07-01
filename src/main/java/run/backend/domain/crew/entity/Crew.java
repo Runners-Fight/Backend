@@ -12,6 +12,7 @@ import java.util.UUID;
 
 @Entity
 @Getter
+@Table(name = "crews")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Crew extends BaseEntity {
 
