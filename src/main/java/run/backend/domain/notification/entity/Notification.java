@@ -11,6 +11,7 @@ import run.backend.global.common.BaseEntity;
 
 @Entity
 @Getter
+@Table(name = "notifications")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Notification extends BaseEntity {
 

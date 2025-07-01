@@ -12,6 +12,7 @@ import java.time.LocalTime;
 
 @Entity
 @Getter
+@Table(name = "crew_records")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CrewRecord extends BaseEntity {
 

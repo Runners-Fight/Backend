@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import run.backend.domain.crew.enums.JoinStatus;
 import run.backend.domain.member.entity.Member;
+import run.backend.domain.member.enums.Role;
 import run.backend.global.common.BaseEntity;
 
 import java.time.LocalDate;
@@ -14,6 +15,7 @@ import java.time.LocalDate;
 
 @Entity
 @Getter
+@Table(name = "join_crews")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class JoinCrew extends BaseEntity {
 
@@ -25,9 +27,9 @@ public class JoinCrew extends BaseEntity {
     @Column(name = "join_status")
     private JoinStatus joinStatus;
 
-//    @Enumerated(EnumType.STRING)
-//    @Column(name = "crew_role")
-//    privare Role role;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "crew_role")
+    private Role role;
 
     @Column(name = "joined_date")
     private LocalDate joinedDate;
@@ -41,20 +43,18 @@ public class JoinCrew extends BaseEntity {
     private Crew crew;
 
     void approveJoin() {
-        this.joinStatus = JoinStatus.APPROVED;
+        this.role = Role.MEMBER;
         this.joinedDate = LocalDate.now();
+        this.joinStatus = JoinStatus.APPROVED;
     }
 
     @Builder
     public JoinCrew(
-            JoinStatus joinStatus,
-//            Role role,
             Member member,
             Crew crew
     ) {
-        this.joinStatus = joinStatus;
-//        this.role = role;
-        this.member = member;
         this.crew = crew;
+        this.member = member;
+        this.joinStatus = JoinStatus.APPLIED;
     }
 }

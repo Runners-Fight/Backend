@@ -9,6 +9,7 @@ import run.backend.domain.member.entity.Member;
 
 @Entity
 @Getter
+@Table(name = "join_events")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class JoinEvent {
 

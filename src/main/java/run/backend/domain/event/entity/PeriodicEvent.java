@@ -15,6 +15,7 @@ import java.time.LocalTime;
 
 @Entity
 @Getter
+@Table(name = "periodic_events")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PeriodicEvent extends BaseEntity {
 

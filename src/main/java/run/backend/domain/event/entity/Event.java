@@ -16,6 +16,7 @@ import java.time.LocalTime;
 
 @Entity
 @Getter
+@Table(name = "events")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Event extends BaseEntity {
 
