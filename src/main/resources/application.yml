@@ -42,3 +42,18 @@ jwt:
 file:
   upload:
     dir: ${user.home}/${UPLOAD_DIR}
+
+swagger:
+  id: ${SWAGGER_ID}
+  pwd: ${SWAGGER_PWD}
+  server:
+    url:
+      prod: ${SERVER_URI}
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger
+  override-with-generic-response: false
