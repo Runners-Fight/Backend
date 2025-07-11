@@ -25,8 +25,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import run.backend.domain.auth.dto.response.TokenResponse;
-import run.backend.global.exception.ApplicationException;
-import run.backend.global.exception.ExceptionCode;
+import run.backend.domain.auth.exception.AuthException;
 
 @Slf4j
 @Component
@@ -74,7 +73,7 @@ public class JwtTokenProvider {
         Claims claims = parseClaims(accessToken);
 
         if (claims.get("auth") == null) {
-            throw new ApplicationException(ExceptionCode.TOKEN_MISSING_AUTHORITY);
+            throw new AuthException.TokenMissingAuthority();
         }
 
         Collection<? extends GrantedAuthority> authorities =
