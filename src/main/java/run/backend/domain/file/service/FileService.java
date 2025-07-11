@@ -6,8 +6,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import run.backend.global.exception.ApplicationException;
-import run.backend.global.exception.ExceptionCode;
+import run.backend.domain.file.exception.FileException;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -53,7 +52,7 @@ public class FileService {
             return newFilename;
 
         } catch (IOException e) {
-            throw new ApplicationException(ExceptionCode.FILE_UPLOAD_FAILED);
+            throw new FileException.FileUploadFailed();
         }
     }
 
@@ -67,13 +66,13 @@ public class FileService {
             Resource resource = new UrlResource(filePath.toUri());
 
             if (!resource.exists() || !resource.isReadable()) {
-                throw new ApplicationException(ExceptionCode.FILE_NOT_FOUND);
+                throw new FileException.FileNotFound();
             }
 
             return resource;
 
         } catch (MalformedURLException e) {
-            throw new ApplicationException(ExceptionCode.FILE_NOT_FOUND);
+            throw new FileException.FileNotFound();
         }
     }
 
@@ -94,32 +93,32 @@ public class FileService {
 
     private void validateFile(MultipartFile file) {
         if (file.getSize() > MAX_FILE_SIZE) {
-            throw new ApplicationException(ExceptionCode.FILE_SIZE_EXCEEDED);
+            throw new FileException.FileSizeExceeded();
         }
 
         String contentType = file.getContentType();
         if (contentType == null || !contentType.startsWith("image/")) {
-            throw new ApplicationException(ExceptionCode.INVALID_FILE_TYPE);
+            throw new FileException.InvalidFileType();
         }
 
         String originalFilename = file.getOriginalFilename();
         if (originalFilename == null || originalFilename.isEmpty()) {
-            throw new ApplicationException(ExceptionCode.INVALID_FILE_NAME);
+            throw new FileException.InvalidFileName();
         }
 
         String extension = getFileExtension(originalFilename);
         if (!ALLOWED_EXTENSIONS.contains(extension.toLowerCase())) {
-            throw new ApplicationException(ExceptionCode.INVALID_FILE_EXTENSION);
+            throw new FileException.InvalidFileExtension();
         }
     }
 
     private void validateFilename(String filename) {
         if (filename == null || filename.trim().isEmpty()) {
-            throw new ApplicationException(ExceptionCode.INVALID_FILE_NAME);
+            throw new FileException.InvalidFileName();
         }
 
         if (!filename.matches("^[a-fA-F0-9-]+\\.(jpg|jpeg|png|gif)$")) {
-            throw new ApplicationException(ExceptionCode.INVALID_FILE_NAME);
+            throw new FileException.InvalidFileName();
         }
     }
 
