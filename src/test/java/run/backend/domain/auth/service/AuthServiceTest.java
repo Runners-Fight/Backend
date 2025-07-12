@@ -41,14 +41,13 @@ import org.springframework.web.client.RestTemplate;
 import run.backend.domain.auth.dto.request.SignupRequest;
 import run.backend.domain.auth.dto.response.SignupResponse;
 import run.backend.domain.auth.dto.response.TokenResponse;
+import run.backend.domain.auth.exception.AuthException;
 import run.backend.domain.auth.repository.RefreshTokenRepository;
 import run.backend.domain.member.entity.Member;
 import run.backend.domain.member.enums.Gender;
 import run.backend.domain.member.enums.OAuthType;
 import run.backend.domain.member.enums.Role;
 import run.backend.domain.member.repository.MemberRepository;
-import run.backend.global.exception.ApplicationException;
-import run.backend.global.exception.ExceptionCode;
 import run.backend.global.oauth2.GoogleUserInfo;
 import run.backend.global.oauth2.OAuth2UserInfo;
 import run.backend.global.oauth2.OAuth2UserInfoFactory;
@@ -257,9 +256,7 @@ class AuthServiceTest {
 
             // when & then
             assertThatThrownBy(() -> authService.socialLogin(providerName, authorizationCode))
-                    .isInstanceOf(ApplicationException.class)
-                    .hasFieldOrPropertyWithValue("exceptionCode", ExceptionCode.OAUTH_REQUEST_FAILED);
-        }
+                    .isInstanceOf(AuthException.OauthRequestFailed.class);}
     }
 
     @Nested
@@ -322,8 +319,7 @@ class AuthServiceTest {
             given(jwtTokenProvider.validateToken(invalidToken)).willReturn(false);
 
             assertThatThrownBy(() -> authService.completeSignup(signupRequest, null))
-                    .isInstanceOf(ApplicationException.class)
-                    .hasFieldOrPropertyWithValue("exceptionCode", ExceptionCode.INVALID_SIGNUP_TOKEN);
+                    .isInstanceOf(AuthException.InvalidSignupToken.class);
 
             verify(jwtTokenProvider).validateToken(invalidToken);
             verify(jwtTokenProvider, never()).parseClaims(anyString());
@@ -350,8 +346,7 @@ class AuthServiceTest {
 
             // when & then
             assertThatThrownBy(() -> authService.completeSignup(signupRequest, null))
-                    .isInstanceOf(ApplicationException.class)
-                    .hasFieldOrPropertyWithValue("exceptionCode", ExceptionCode.USER_ALREADY_EXISTS);
+                    .isInstanceOf(AuthException.UserAlreadyExists.class);
 
             verify(jwtTokenProvider).validateToken(signupToken);
             verify(jwtTokenProvider).parseClaims(signupToken);
@@ -376,8 +371,7 @@ class AuthServiceTest {
 
             // when & then
             assertThatThrownBy(() -> authService.socialLogin(providerName, authorizationCode))
-                    .isInstanceOf(ApplicationException.class)
-                    .hasFieldOrPropertyWithValue("exceptionCode", ExceptionCode.OAUTH_REQUEST_FAILED);
+                    .isInstanceOf(AuthException.OauthRequestFailed.class);
         }
 
         @Test
@@ -395,8 +389,7 @@ class AuthServiceTest {
 
             // when & then
             assertThatThrownBy(() -> authService.completeSignup(signupRequest, null))
-                    .isInstanceOf(ApplicationException.class)
-                    .hasFieldOrPropertyWithValue("exceptionCode", ExceptionCode.INVALID_SIGNUP_TOKEN);
+                    .isInstanceOf(AuthException.InvalidSignupToken.class);
         }
     }
 

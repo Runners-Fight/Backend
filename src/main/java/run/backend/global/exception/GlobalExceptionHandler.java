@@ -1,66 +1,74 @@
 package run.backend.global.exception;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import run.backend.domain.auth.exception.AuthException;
+import run.backend.domain.file.exception.FileException;
 import run.backend.global.common.response.CommonResponse;
-
-import static run.backend.global.exception.ExceptionCode.INTERNAL_SERVER_ERROR;
+import run.backend.global.exception.httpError.HttpErrorCode;
 
 @Slf4j
 @RestControllerAdvice
 @RequiredArgsConstructor
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(ApplicationException.class)
-    protected ResponseEntity<CommonResponse<Void>> handleApplicationException(ApplicationException e, HttpServletRequest request){
+    @ExceptionHandler({
+            AuthException.RefreshTokenNotFound.class,
+            FileException.FileNotFound.class
+    })
+    public ResponseEntity<CommonResponse<Void>> handleNotFound(final CustomException e) {
 
-        applicationLogFormat(e, request);
+        log.warn("[NOT_FOUND_EXCEPTION] {}", e.toString());
 
-        return ResponseEntity.status(e.getExceptionCode().getHttpStatus())
-                .body(new CommonResponse<Void>(e.getExceptionCode()));
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new CommonResponse<>(e.getErrorCode(), e.getErrorMessage()));
+    }
+
+    @ExceptionHandler({
+            AuthException.UserAlreadyExists.class,
+            FileException.FileSizeExceeded.class,
+            FileException.InvalidFileName.class,
+            FileException.InvalidFileExtension.class,
+            FileException.InvalidFileType.class
+    })
+    public ResponseEntity<CommonResponse<Void>> handleConflict(final CustomException e) {
+
+        log.warn("[CONFLICT_EXCEPTION] {}", e.toString());
+
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(new CommonResponse<>(e.getErrorCode(), e.getErrorMessage()));
+    }
+
+    @ExceptionHandler({
+            AuthException.InvalidSignupToken.class,
+            AuthException.OauthRequestFailed.class,
+            AuthException.TokenMissingAuthority.class,
+            AuthException.InvalidRefreshToken.class,
+            AuthException.RefreshTokenExpired.class,
+            FileException.FileUploadFailed.class
+    })
+    public ResponseEntity<CommonResponse<Void>> handleBadRequest(final CustomException e) {
+
+        log.warn("[BAD_REQUEST_EXCEPTION] {}", e.toString());
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new CommonResponse<>(e.getErrorCode(), e.getErrorMessage()));
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<CommonResponse<Void>> handleException(Exception e, HttpServletRequest request){
+    public ResponseEntity<CommonResponse<Void>> handleUnknownException(final Exception e) {
 
-        logFormat(e, request);
+        log.error("[INTERNAL_SERVER_ERROR]", e);
 
-        return ResponseEntity.internalServerError()
-                .body(new CommonResponse<Void>(INTERNAL_SERVER_ERROR));
-    }
-
-    private void applicationLogFormat(ApplicationException e, HttpServletRequest request) {
-
-        log.warn(
-                "\n[{} 발생]\n" +
-                        "exception code: {}\n" +
-                        "uri: {}\n" +
-                        "method: {}\n" +
-                        "message: {}\n",
-                e.getExceptionCode().name(),
-                e.getExceptionCode().getCode(),
-                e.getMessage(),
-                request.getRequestURI(),
-                request.getMethod(),
-                e
-        );
-    }
-
-    private void logFormat(Exception e, HttpServletRequest request) {
-
-        log.error(
-                "\n[Exception 발생]\n" +
-                        "uri: {}\n" +
-                        "method: {}\n" +
-                        "message: {}\n",
-                request.getRequestURI(),
-                request.getMethod(),
-                e.getMessage(),
-                e
-        );
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new CommonResponse<>(HttpErrorCode.INTERNAL_SERVER_ERROR.getErrorCode(), HttpErrorCode.INTERNAL_SERVER_ERROR.getErrorMessage()));
     }
 }

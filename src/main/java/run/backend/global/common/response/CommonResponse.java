@@ -1,7 +1,7 @@
 package run.backend.global.common.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import run.backend.global.exception.ExceptionCode;
+import run.backend.global.exception.ErrorCode;
 
 import java.time.LocalDateTime;
 
@@ -24,7 +24,7 @@ public record CommonResponse<T>(
     }
 
     // api 응답이 실패인 경우
-    public CommonResponse(ExceptionCode exceptionCode) {
-        this(LocalDateTime.now(), exceptionCode.getCode(), exceptionCode.getMessage(), null);
+    public CommonResponse(int errorCode, String errorMessage) {
+        this(LocalDateTime.now(), errorCode, errorMessage, null);
     }
 }

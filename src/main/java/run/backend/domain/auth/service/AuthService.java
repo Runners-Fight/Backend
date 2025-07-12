@@ -24,13 +24,11 @@ import run.backend.domain.auth.dto.request.SignupRequest;
 import run.backend.domain.auth.dto.response.SignupResponse;
 import run.backend.domain.auth.dto.response.TokenResponse;
 import run.backend.domain.auth.entity.RefreshToken;
+import run.backend.domain.auth.exception.AuthException;
 import run.backend.domain.auth.repository.RefreshTokenRepository;
 import run.backend.domain.member.entity.Member;
 import run.backend.domain.member.enums.OAuthType;
-import run.backend.domain.member.enums.Role;
 import run.backend.domain.member.repository.MemberRepository;
-import run.backend.global.exception.ApplicationException;
-import run.backend.global.exception.ExceptionCode;
 import run.backend.global.oauth2.OAuth2UserInfo;
 import run.backend.global.oauth2.OAuth2UserInfoFactory;
 import run.backend.global.security.CustomUserDetails;
@@ -76,7 +74,7 @@ public class AuthService {
 
     public TokenResponse completeSignup(SignupRequest signupRequest, MultipartFile profileImage) {
         if (!jwtTokenProvider.validateToken(signupRequest.signupToken())) {
-            throw new ApplicationException(ExceptionCode.INVALID_SIGNUP_TOKEN);
+            throw new AuthException.InvalidSignupToken();
         }
 
         Claims claims = jwtTokenProvider.parseClaims(signupRequest.signupToken());
@@ -86,7 +84,7 @@ public class AuthService {
         String name = claims.get("name", String.class);
 
         memberRepository.findByOauthId(oauthId).ifPresent(m -> {
-            throw new ApplicationException(ExceptionCode.USER_ALREADY_EXISTS);
+            throw new AuthException.UserAlreadyExists();
         });
 
         String profileImageName = fileService.saveProfileImage(profileImage);
@@ -129,7 +127,7 @@ public class AuthService {
             ResponseEntity<String> response = restTemplate.postForEntity(tokenUri, request, String.class);
             Map<String, Object> responseBody = objectMapper.readValue(response.getBody(), new TypeReference<>() {});
             return (String) responseBody.get("access_token");
-        } catch (Exception e) { throw new ApplicationException(ExceptionCode.OAUTH_REQUEST_FAILED); }
+        } catch (Exception e) { throw new AuthException.OauthRequestFailed(); }
     }
 
     private Map<String, Object> getUserAttributes(String accessToken, ClientRegistration provider) {
@@ -140,21 +138,21 @@ public class AuthService {
         try {
             ResponseEntity<String> response = restTemplate.exchange(userInfoUri, HttpMethod.GET, request, String.class);
             return objectMapper.readValue(response.getBody(), new TypeReference<>() {});
-        } catch (Exception e) { throw new ApplicationException(ExceptionCode.OAUTH_REQUEST_FAILED); }
+        } catch (Exception e) { throw new AuthException.OauthRequestFailed(); }
     }
 
     public TokenResponse refreshTokens(String authorizationCode) {
         String refreshToken = extractTokenFromHeader(authorizationCode);
 
         if (!jwtTokenProvider.validateToken(refreshToken)) {
-            throw new ApplicationException(ExceptionCode.INVALID_REFRESH_TOKEN);
+            throw new AuthException.InvalidRefreshToken();
         }
 
         RefreshToken refreshTokenEntity = refreshTokenRepository.findByToken(refreshToken)
-            .orElseThrow(() -> new ApplicationException(ExceptionCode.REFRESH_TOKEN_NOT_FOUND));
+            .orElseThrow(AuthException.RefreshTokenNotFound::new);
 
         if (refreshTokenEntity.isExpired()) {
-            throw new ApplicationException(ExceptionCode.REFRESH_TOKEN_EXPIRED);
+            throw new AuthException.RefreshTokenExpired();
         }
 
         Member member = refreshTokenEntity.getMember();
@@ -180,7 +178,7 @@ public class AuthService {
 
     private String extractTokenFromHeader(String authorizationHeader) {
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            throw new ApplicationException(ExceptionCode.INVALID_REFRESH_TOKEN);
+            throw new AuthException.InvalidRefreshToken();
         }
         return authorizationHeader.substring(7);
     }
