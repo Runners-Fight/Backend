@@ -4,10 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import run.backend.domain.crew.entity.Crew;
+import run.backend.domain.crew.enums.JoinStatus;
 import run.backend.domain.member.dto.request.MemberInfoRequest;
 import run.backend.domain.member.dto.response.MemberInfoResponse;
 import run.backend.domain.member.entity.Member;
-import run.backend.domain.member.exception.MemberException;
 import run.backend.domain.member.repository.MemberRepository;
 
 @Service
@@ -32,9 +32,10 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public MemberInfoResponse getMemberInfo(Member member) {
 
-        Crew crew = memberRepository.findCrewByMemberId(member.getId())
-                .orElseThrow(MemberException.MemberNotJoinedCrew::new);
+        String crewName = memberRepository.findCrewByMemberIdAndStatus(member.getId(), JoinStatus.APPROVED)
+                .map(Crew::getName)
+                .orElse("N/A");
 
-        return new MemberInfoResponse(member.getProfileImage(), member.getNickname(), crew.getName());
+        return new MemberInfoResponse(member.getProfileImage(), member.getNickname(), crewName);
     }
 }
