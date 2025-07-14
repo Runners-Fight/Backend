@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import run.backend.domain.auth.exception.AuthException;
 import run.backend.domain.file.exception.FileException;
+import run.backend.domain.member.exception.MemberException;
 import run.backend.global.common.response.CommonResponse;
 import run.backend.global.exception.httpError.HttpErrorCode;
 
@@ -18,7 +19,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({
             AuthException.RefreshTokenNotFound.class,
-            FileException.FileNotFound.class
+            FileException.FileNotFound.class,
+            MemberException.MemberNotJoinedCrew.class
     })
     public ResponseEntity<CommonResponse<Void>> handleNotFound(final CustomException e) {
 
