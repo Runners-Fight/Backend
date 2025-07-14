@@ -35,9 +35,8 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-	// postgreSql
-	runtimeOnly 'org.postgresql:postgresql'
-	implementation 'org.postgresql:postgresql:42.7.3'
+	// mysql
+	runtimeOnly 'com.mysql:mysql-connector-j'
 
 	// jwt
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
