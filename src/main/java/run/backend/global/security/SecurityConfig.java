@@ -47,6 +47,7 @@ public class SecurityConfig {
     };
 
     private final String[] PermitAllPatterns = {
+            "/api/v1/members/**",
             "/api/v1/auth/**"
     };
 
