@@ -42,7 +42,7 @@ public class JoinCrew extends BaseEntity {
     @JoinColumn(name = "crew_id")
     private Crew crew;
 
-    void approveJoin() {
+    public void approveJoin() {
         this.role = Role.MEMBER;
         this.joinedDate = LocalDate.now();
         this.joinStatus = JoinStatus.APPROVED;

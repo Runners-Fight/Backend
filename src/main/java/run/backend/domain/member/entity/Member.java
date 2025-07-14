@@ -47,6 +47,12 @@ public class Member extends BaseEntity {
 
     private boolean pushEnabled;
 
+    public void setMemberDefaultInfo(Gender gender, int age, String nickname) {
+        this.gender = gender;
+        this.age = age;
+        this.nickname = nickname;
+    }
+
     @Builder
     public Member(String username, String nickname, Gender gender, int age, String oauthId, OAuthType oauthType, String profileImage) {
         this.username = username;

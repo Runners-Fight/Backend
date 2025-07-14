@@ -1,17 +1,17 @@
 package run.backend.domain.member.service;
 
-import run.backend.domain.member.dto.request.MemberInfoRequest;
 import run.backend.domain.member.dto.response.MemberInfoResponse;
+import run.backend.domain.member.entity.Member;
 
 public interface MemberService {
 
-    void updateMember(Long memberId, MemberInfoRequest memberInfoRequest);
+    MemberInfoResponse getMemberInfo(Member member);
 
-    MemberInfoResponse getMemberInfo(Long memberId);
+//    void updateMember();
 
-    void deleteMember(Long memberId);
-
-    void leaveCrew(Long memberId, Long crewId);
-
-    void joinCrew(String crewCode);
+//    void deleteMember(Member member);
+//
+//    void leaveCrew(Member member, Long crewId);
+//
+//    void joinCrew(String crewCode);
 }
