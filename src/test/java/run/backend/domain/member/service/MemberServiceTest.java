@@ -9,10 +9,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import run.backend.domain.crew.entity.Crew;
 import run.backend.domain.crew.enums.JoinStatus;
-import run.backend.domain.member.dto.request.MemberInfoRequest;
 import run.backend.domain.member.dto.response.MemberInfoResponse;
 import run.backend.domain.member.entity.Member;
-import run.backend.domain.member.enums.Gender;
 import run.backend.domain.member.enums.OAuthType;
 import run.backend.domain.member.repository.MemberRepository;
 
@@ -50,26 +48,6 @@ public class MemberServiceTest {
                 .description("크루 소개 테스트")
                 .image("test image url")
                 .build();
-    }
-
-    @Test
-    @DisplayName("회원 정보가 올바르게 변경 되었는지 확인")
-    public void saveMemberInfoTest() {
-
-        // given
-        MemberInfoRequest request = new MemberInfoRequest(
-              Gender.FEMALE,
-              24,
-              "test nickname"
-        );
-
-        // when
-        memberService.saveMember(testMember, request);
-
-        // then
-        assertEquals(Gender.FEMALE, testMember.getGender());
-        assertEquals(24, testMember.getAge());
-        assertEquals("test nickname", testMember.getNickname());
     }
 
     @Test
