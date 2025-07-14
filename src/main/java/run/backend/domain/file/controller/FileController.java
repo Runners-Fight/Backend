@@ -1,5 +1,6 @@
 package run.backend.domain.file.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
@@ -23,6 +24,7 @@ public class FileController {
 
     private final FileService fileService;
 
+    @Operation(summary = "프로필 이미지 조회", description = "유저 프로필 이미지를 조회하는 API 입니다.")
     @GetMapping("/profiles/{filename}")
     public ResponseEntity<Resource> getProfileImage(@PathVariable String filename) {
         Resource resource = fileService.getFileResource(filename);
