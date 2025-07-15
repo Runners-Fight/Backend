@@ -36,10 +36,13 @@ public class MemberServiceImpl implements MemberService {
         switch (imageStatus) {
 
             case "updated" :
-                String newImageName = fileService.saveProfileImage(image);
+                fileService.deleteImage(member.getProfileImage());   // 기존 이미지 지우기
+                String newImageName = fileService.saveProfileImage(image);   // 새로운 이미지 저장
                 member.updateImage(newImageName);
                 break ;
             case "removed" :
+                fileService.deleteImage(member.getProfileImage());
+                member.updateImage("default-profile-image.png");
                 break ;
         }
 
