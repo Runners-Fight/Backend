@@ -1,13 +1,13 @@
 services:
   db:
-    image: postgres:15
+    image: mysql:8.0
     restart: unless-stopped
     container_name: runners_db
     env_file: .env
     ports:
-      - "5432:5432"
+      - "3306:3306"
     volumes:
-      - runners_db:/var/lib/postgresql/data
+      - runners_db:/var/lib/mysql
 
   app:
     image: openjdk:17-slim
@@ -25,4 +25,3 @@ services:
 
 volumes:
   runners_db:
-
