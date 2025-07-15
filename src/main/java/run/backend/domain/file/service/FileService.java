@@ -29,6 +29,22 @@ public class FileService {
         "gif");
     private static final long MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
+    public void deleteImage(String fileName) {
+
+        validateFilename(fileName);
+        if (fileName.equals("default-profile-image.png"))
+            return ;
+
+        try {
+            Path uploadPath = Paths.get(uploadDir, "profiles");
+            Path filePath = uploadPath.resolve(fileName);
+            Files.deleteIfExists(filePath);
+
+        } catch (IOException e) {
+            throw new FileException.FileDeleteFailed();
+        }
+    }
+
     public String saveProfileImage(MultipartFile file) {
         if (file == null || file.isEmpty()) {
             return "default-profile-image.png";
