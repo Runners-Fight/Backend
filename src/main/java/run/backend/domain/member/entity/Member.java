@@ -47,10 +47,20 @@ public class Member extends BaseEntity {
 
     private boolean pushEnabled;
 
-    public void setMemberDefaultInfo(Gender gender, int age, String nickname) {
+    public void updateGender(Gender gender) {
         this.gender = gender;
+    }
+
+    public void updateAge(int age) {
         this.age = age;
+    }
+
+    public void updateNickname(String nickname) {
         this.nickname = nickname;
+    }
+
+    public void updateImage(String imageName) {
+        this.profileImage = imageName;
     }
 
     @Builder

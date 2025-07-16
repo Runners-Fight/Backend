@@ -10,11 +10,14 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import run.backend.domain.member.entity.Member;
+import run.backend.domain.member.repository.MemberRepository;
 import run.backend.global.security.CustomUserDetails;
 
 @Component
 @RequiredArgsConstructor
 public class LoginArgumentResolver implements HandlerMethodArgumentResolver {
+
+    private final MemberRepository memberRepository;
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
@@ -28,8 +31,11 @@ public class LoginArgumentResolver implements HandlerMethodArgumentResolver {
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
                                   NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        CustomUserDetails principal = (CustomUserDetails) authentication.getPrincipal();
-        return principal.getMember();
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        CustomUserDetails principal = (CustomUserDetails) authentication.getPrincipal();
+//        return principal.getMember();
+
+        return memberRepository.findById(1L)
+                .orElseThrow(() -> new IllegalArgumentException("해당 유저가 없습니다"));
     }
 }

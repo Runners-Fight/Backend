@@ -43,4 +43,10 @@ public class FileException extends CustomException {
             super(FileErrorCode.FILE_NOT_FOUND);
         }
     }
+
+    public static class FileDeleteFailed extends FileException {
+        public FileDeleteFailed() {
+            super(FileErrorCode.FILE_DELETE_FAILED);
+        }
+    }
 }
