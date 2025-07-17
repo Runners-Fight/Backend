@@ -36,5 +36,6 @@ public class JoinEvent {
         this.isRunning = false;
         this.member = member;
         this.event = event;
+        this.event.incrementExpectedParticipants();
     }
 }

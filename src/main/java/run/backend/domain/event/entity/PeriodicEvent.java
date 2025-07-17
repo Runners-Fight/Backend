@@ -49,7 +49,7 @@ public class PeriodicEvent extends BaseEntity {
     @JoinColumn(name = "crew_id")
     private Crew crew;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "running_captain")
     private Member member;
 

@@ -70,10 +70,18 @@ public class Event extends BaseEntity {
         this.startTime = startTime;
         this.endTime = endTime;
         this.place = place;
-        this.expectedParticipants = 1L;
+        this.expectedParticipants = 0L;
         this.actualParticipants = 0L;
         this.crew = crew;
         this.record = record;
         this.member = member;
+    }
+
+    public void incrementExpectedParticipants() {
+        this.expectedParticipants++;
+    }
+
+    public void incrementActualParticipants() {
+        this.actualParticipants++;
     }
 }
