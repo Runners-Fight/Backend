@@ -50,7 +50,7 @@ public class Event extends BaseEntity {
     @JoinColumn(name = "record_id")
     private CrewRecord record;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "running_captain")
     private Member member;
 

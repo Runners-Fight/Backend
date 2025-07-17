@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import run.backend.domain.crew.entity.Crew;
 import run.backend.domain.event.enums.RepeatCycle;
 import run.backend.domain.event.enums.WeekDay;
+import run.backend.domain.member.entity.Member;
 import run.backend.global.common.BaseEntity;
 
 import java.time.LocalDate;
@@ -48,6 +49,10 @@ public class PeriodicEvent extends BaseEntity {
     @JoinColumn(name = "crew_id")
     private Crew crew;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "running_captain")
+    private Member member;
+
     @Builder
     public PeriodicEvent(
             String title,
@@ -57,7 +62,8 @@ public class PeriodicEvent extends BaseEntity {
             LocalTime startTime,
             LocalTime endTime,
             String place,
-            Crew crew
+            Crew crew,
+            Member member
     ) {
         this.title = title;
         this.baseDate = baseDate;
@@ -67,5 +73,6 @@ public class PeriodicEvent extends BaseEntity {
         this.endTime = endTime;
         this.place = place;
         this.crew = crew;
+        this.member = member;
     }
 }
