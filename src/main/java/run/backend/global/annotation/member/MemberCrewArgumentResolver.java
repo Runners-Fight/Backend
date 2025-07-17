@@ -11,7 +11,6 @@ import run.backend.domain.crew.entity.Crew;
 import run.backend.domain.crew.entity.JoinCrew;
 import run.backend.domain.crew.enums.JoinStatus;
 import run.backend.domain.crew.repository.JoinCrewRepository;
-import run.backend.domain.member.repository.MemberRepository;
 
 @Component
 @RequiredArgsConstructor
