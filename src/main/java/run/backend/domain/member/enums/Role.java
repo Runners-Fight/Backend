@@ -1,7 +1,6 @@
 package run.backend.domain.member.enums;
 
 import lombok.Getter;
-import java.util.Set;
 
 @Getter
 public enum Role {
@@ -14,9 +13,5 @@ public enum Role {
 
     Role(String description) {
         this.description = description;
-    }
-
-    public static Set<Role> getManagementRoles() {
-        return Set.of(LEADER, MANAGER);
     }
 }

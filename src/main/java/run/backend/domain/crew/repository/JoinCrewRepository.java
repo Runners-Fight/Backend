@@ -25,12 +25,10 @@ public interface JoinCrewRepository extends JpaRepository<JoinCrew, Long> {
         AND requesterJoin.joinStatus = :status
         AND captainJoin.member.id = :runningCaptainId
         AND captainJoin.joinStatus = :status
-        AND captainJoin.role IN :managementRoles
         """)
     Optional<EventCreationValidationDto> validateEventCreation(
         @Param("requesterId") Long requesterId, 
         @Param("runningCaptainId") Long runningCaptainId,
-        @Param("status") JoinStatus status,
-        @Param("managementRoles") java.util.Set<run.backend.domain.member.enums.Role> managementRoles
+        @Param("status") JoinStatus status
     );
 }
