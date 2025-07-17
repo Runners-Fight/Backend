@@ -10,7 +10,7 @@ public class EventException extends CustomException {
 
     public static class InvalidEventCreationRequest extends EventException {
         public InvalidEventCreationRequest() {
-            super(EventErrorCode.RUNNING_CAPTAIN_NOT_CREW_MANAGER);
+            super(EventErrorCode.RUNNING_CAPTAIN_NOT_CREW_MEMBER);
         }
     }
 }
