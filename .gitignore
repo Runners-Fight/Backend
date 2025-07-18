@@ -44,3 +44,4 @@ secrets.yml
 .env
 src/test/resources/application.yml
 /uploads
+./scripts
