@@ -95,14 +95,7 @@ public class CrewServiceImpl implements CrewService {
                 .orElseThrow(CrewException.NotFoundCrew::new);
         Member leader = joinCrewRepository.findCrewLeader(Role.LEADER, crew);
 
-        return CrewProfileResponse.builder()
-                .crewImage(crew.getImage())
-                .crewName(crew.getName())
-                .crewDescription(crew.getDescription())
-                .memberCount(crew.getMemberCount())
-                .leaderImage(leader.getProfileImage())
-                .leaderName(leader.getNickname())
-                .build();
+        return CrewProfileResponse.of(crew, leader);
     }
 
     @Override
