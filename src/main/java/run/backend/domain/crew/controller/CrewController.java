@@ -12,6 +12,7 @@ import run.backend.domain.crew.entity.Crew;
 import run.backend.domain.crew.service.CrewServiceImpl;
 import run.backend.domain.member.entity.Member;
 import run.backend.global.annotation.member.Login;
+import run.backend.global.annotation.member.MemberCrew;
 import run.backend.global.common.response.CommonResponse;
 
 @RestController
@@ -39,7 +40,7 @@ public class CrewController {
     @PatchMapping
     public CommonResponse<Void> updateCrewInfo(
             @Login Member member,
-            Crew crew,
+            @MemberCrew Crew crew,
             @RequestParam String imageStatus,
             @RequestPart(value = "data")CrewInfoRequest data,
             @RequestPart(value = "image", required = false) MultipartFile image
@@ -51,7 +52,7 @@ public class CrewController {
 
     @Operation(summary = "크루의 초대 코드 조회", description = "크루의 초대 코드 조회하는 API 입니다.")
     @GetMapping("/{crewId}/invite-code")
-    public CommonResponse<CrewInviteCodeDto> getCrewInviteCode(Crew crew) {
+    public CommonResponse<CrewInviteCodeDto> getCrewInviteCode(@MemberCrew Crew crew) {
 
         CrewInviteCodeDto response = crewService.getCrewInviteCode(crew);
         return new CommonResponse<>("크루 초대 코드 조회 성공", response);
