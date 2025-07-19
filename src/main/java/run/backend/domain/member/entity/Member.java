@@ -63,6 +63,10 @@ public class Member extends BaseEntity {
         this.profileImage = imageName;
     }
 
+    public void updateRole(Role role) {
+        this.role = role;
+    }
+
     @Builder
     public Member(String username, String nickname, Gender gender, int age, String oauthId, OAuthType oauthType, String profileImage) {
         this.username = username;
