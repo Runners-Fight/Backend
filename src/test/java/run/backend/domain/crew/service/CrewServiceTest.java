@@ -29,6 +29,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 
+@DisplayName("Crew 서비스 테스트")
 @ExtendWith(MockitoExtension.class)
 public class CrewServiceTest {
 
