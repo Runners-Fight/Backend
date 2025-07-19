@@ -3,6 +3,7 @@ package run.backend.domain.crew.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import run.backend.domain.crew.dto.common.CrewInviteCodeDto;
@@ -37,6 +38,7 @@ public class CrewController {
     }
 
     @PatchMapping
+    @PreAuthorize("hasRole('MANAGER') or hasRole('LEADER')")
     @Operation(summary = "크루 정보 수정", description = "크루 정보 수정하는 API 입니다.")
     public CommonResponse<Void> updateCrewInfo(
             @Login Member member,
