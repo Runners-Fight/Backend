@@ -48,7 +48,8 @@ public class SecurityConfig {
 
     private final String[] PermitAllPatterns = {
             "/api/v1/members/**",
-            "/api/v1/auth/**"
+            "/api/v1/auth/**",
+            "/api/v1/events/**"
     };
 
     @Bean

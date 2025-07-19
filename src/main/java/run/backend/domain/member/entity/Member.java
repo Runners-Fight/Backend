@@ -79,4 +79,8 @@ public class Member extends BaseEntity {
         this.pushEnabled = true;
         this.role = Role.NONE;
     }
+
+    public String toString() {
+        return "[멤버] 닉네임: " + this.nickname;
+    }
 }
