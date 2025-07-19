@@ -41,6 +41,22 @@ public class Crew extends BaseEntity {
     @Column(name = "monthly_score_total")
     private BigDecimal monthlyScoreTotal;
 
+    public void incrementMemberCount() {
+        this.memberCount++;
+    }
+
+    public void updateName(String newName) {
+        this.name = newName;
+    }
+
+    public void updateDescription(String newDescription) {
+        this.description = newDescription;
+    }
+
+    public void updateImage(String newImageName) {
+        this.image = newImageName;
+    }
+
     @Builder
     public Crew (
             String name,
