@@ -110,7 +110,9 @@ public class CrewServiceImpl implements CrewService {
     public void joinCrew(Member member, Long crewId) {
 
         Crew crew = crewRepository.findById(crewId)
-                .orElseThrow();
+                .orElseThrow(CrewException.NotFoundCrew::new);
+        if (joinCrewRepository.existsByMemberAndJoinStatus(member, JoinStatus.APPROVED))
+            throw new CrewException.AlreadyJoinedCrew();
 
         JoinCrew joinCrew = JoinCrew.createAppliedJoin(member, crew);
         joinCrewRepository.save(joinCrew);

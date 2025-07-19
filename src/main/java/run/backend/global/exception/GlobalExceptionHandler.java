@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import run.backend.domain.auth.exception.AuthException;
+import run.backend.domain.crew.exception.CrewException;
 import run.backend.domain.file.exception.FileException;
 import run.backend.domain.member.exception.MemberException;
 import run.backend.global.common.response.CommonResponse;
@@ -20,7 +21,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({
             AuthException.RefreshTokenNotFound.class,
             FileException.FileNotFound.class,
-            MemberException.MemberNotJoinedCrew.class
+            MemberException.MemberNotJoinedCrew.class,
+            CrewException.NotFoundCrew.class
     })
     public ResponseEntity<CommonResponse<Void>> handleNotFound(final CustomException e) {
 
@@ -36,7 +38,8 @@ public class GlobalExceptionHandler {
             FileException.FileSizeExceeded.class,
             FileException.InvalidFileName.class,
             FileException.InvalidFileExtension.class,
-            FileException.InvalidFileType.class
+            FileException.InvalidFileType.class,
+            CrewException.AlreadyJoinedCrew.class
     })
     public ResponseEntity<CommonResponse<Void>> handleConflict(final CustomException e) {
 
