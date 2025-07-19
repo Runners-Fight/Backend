@@ -1,26 +1,38 @@
 package run.backend.domain.crew.service;
 
+import org.springframework.web.multipart.MultipartFile;
+import run.backend.domain.crew.dto.common.CrewInviteCodeDto;
 import run.backend.domain.crew.dto.request.CrewInfoRequest;
 import run.backend.domain.crew.dto.response.*;
+import run.backend.domain.crew.entity.Crew;
+import run.backend.domain.member.entity.Member;
 import run.backend.domain.member.enums.Role;
 
 import java.time.YearMonth;
 
 public interface CrewService {
 
-    void updateCrew(CrewInfoRequest crewInfoRequest);
+    CrewInviteCodeDto createCrew(Member member, String imageStatus, MultipartFile image, CrewInfoRequest crewInfoRequest);
 
-    CrewSearchResponse searchCrew(String crewName);
+    void updateCrew(Member member, Crew crew, String imageStatus, MultipartFile image, CrewInfoRequest crewInfoRequest);
 
-    CrewInfoResponse getCrewInfo(Long crewId);
+    CrewInviteCodeDto getCrewInviteCode(Crew crew);
 
-    CrewMonthlyCanlendarResponse getCrewMonthlyCalendar(Long crewId, YearMonth yearMonth);
+    CrewProfileResponse getCrewByInviteCode(String inviteCode);
 
-    CrewUpcomingEventResponse getUpcomingEvents(Long crewId);
+    void joinCrew(Member member, Long crewId);
 
-    CrewMemberResponse getCrewMemberProfile(Long crewId);
-
-    void updateCrewMemberRole(Long memberId, Role role);
-
-    CrewSearchResponse getRankCrew();
+//    CrewSearchResponse searchCrew(String crewName);
+//
+//    CrewInfoResponse getCrewInfo(Long crewId);
+//
+//    CrewMonthlyCanlendarResponse getCrewMonthlyCalendar(Long crewId, YearMonth yearMonth);
+//
+//    CrewUpcomingEventResponse getUpcomingEvents(Long crewId);
+//
+//    CrewMemberResponse getCrewMemberProfile(Long crewId);
+//
+//    void updateCrewMemberRole(Long memberId, Role role);
+//
+//    CrewSearchResponse getRankCrew();
 }
