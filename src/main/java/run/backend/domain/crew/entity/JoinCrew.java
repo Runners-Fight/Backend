@@ -48,13 +48,38 @@ public class JoinCrew extends BaseEntity {
         this.joinStatus = JoinStatus.APPROVED;
     }
 
+    public static JoinCrew createLeaderJoin(Member member, Crew crew) {
+        return JoinCrew.builder()
+                .crew(crew)
+                .member(member)
+                .role(Role.LEADER)
+                .joinStatus(JoinStatus.APPROVED)
+                .joinedDate(LocalDate.now())
+                .build();
+    }
+
+    public static JoinCrew createAppliedJoin(Member member, Crew crew) {
+        return JoinCrew.builder()
+                .crew(crew)
+                .member(member)
+                .role(Role.MEMBER)
+                .joinStatus(JoinStatus.APPLIED)
+                .build();
+    }
+
     @Builder
-    public JoinCrew(
+    private JoinCrew(
             Member member,
-            Crew crew
+            Crew crew,
+            Role role,
+            JoinStatus joinStatus,
+            LocalDate joinedDate
+
     ) {
         this.crew = crew;
         this.member = member;
-        this.joinStatus = JoinStatus.APPLIED;
+        this.role = role;
+        this.joinStatus = joinStatus;
+        this.joinedDate = joinedDate;
     }
 }
