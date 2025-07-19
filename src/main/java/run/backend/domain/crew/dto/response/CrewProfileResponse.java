@@ -1,6 +1,8 @@
 package run.backend.domain.crew.dto.response;
 
 import lombok.Builder;
+import run.backend.domain.crew.entity.Crew;
+import run.backend.domain.member.entity.Member;
 
 @Builder
 public record CrewProfileResponse(
@@ -11,4 +13,16 @@ public record CrewProfileResponse(
         String leaderImage,
         String leaderName
 ) {
+
+    public static CrewProfileResponse of(Crew crew, Member leader) {
+
+        return new CrewProfileResponse(
+                crew.getImage(),
+                crew.getName(),
+                crew.getDescription(),
+                crew.getMemberCount(),
+                leader.getProfileImage(),
+                leader.getNickname()
+        );
+    }
 }
