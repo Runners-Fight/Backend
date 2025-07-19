@@ -23,8 +23,8 @@ public class CrewController {
 
     private final CrewServiceImpl crewService;
 
-    @Operation(summary = "크루 생성", description = "크루 생성하는 API 입니다.")
     @PostMapping
+    @Operation(summary = "크루 생성", description = "크루 생성하는 API 입니다.")
     public CommonResponse<CrewInviteCodeDto> createCrew(
             @Login Member member,
             @RequestParam String imageStatus,
@@ -36,8 +36,8 @@ public class CrewController {
         return new CommonResponse<>("크루 생성 성공", response);
     }
 
-    @Operation(summary = "크루 정보 수정", description = "크루 정보 수정하는 API 입니다.")
     @PatchMapping
+    @Operation(summary = "크루 정보 수정", description = "크루 정보 수정하는 API 입니다.")
     public CommonResponse<Void> updateCrewInfo(
             @Login Member member,
             @MemberCrew Crew crew,
@@ -50,24 +50,24 @@ public class CrewController {
         return new CommonResponse<>("크루 정보 수정 성공");
     }
 
-    @Operation(summary = "크루의 초대 코드 조회", description = "크루의 초대 코드 조회하는 API 입니다.")
     @GetMapping("/{crewId}/invite-code")
+    @Operation(summary = "크루의 초대 코드 조회", description = "크루의 초대 코드 조회하는 API 입니다.")
     public CommonResponse<CrewInviteCodeDto> getCrewInviteCode(@MemberCrew Crew crew) {
 
         CrewInviteCodeDto response = crewService.getCrewInviteCode(crew);
         return new CommonResponse<>("크루 초대 코드 조회 성공", response);
     }
 
-    @Operation(summary = "초대 코드로 크루 조회", description = "초대 코드로 크루를 조회하는 API 입니다.")
     @GetMapping("/invite-code/{inviteCode}")
+    @Operation(summary = "초대 코드로 크루 조회", description = "초대 코드로 크루를 조회하는 API 입니다.")
     public CommonResponse<CrewProfileResponse> getCrewByInviteCode(@PathVariable String inviteCode) {
 
         CrewProfileResponse response = crewService.getCrewByInviteCode(inviteCode);
         return new CommonResponse<>("크루 조회 성공", response);
     }
 
-    @Operation(summary = "크루 가입", description = "크루 가입하는 API 입니다.")
     @PostMapping("/{crewId}/join")
+    @Operation(summary = "크루 가입", description = "크루 가입하는 API 입니다.")
     public CommonResponse<Void> joinCrew(
             @Login Member member,
             @PathVariable Long crewId) {
