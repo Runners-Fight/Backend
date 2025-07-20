@@ -15,6 +15,7 @@ import run.backend.domain.crew.entity.Crew;
 import run.backend.domain.crew.entity.JoinCrew;
 import run.backend.domain.crew.enums.JoinStatus;
 import run.backend.domain.crew.exception.CrewException;
+import run.backend.domain.crew.mapper.CrewMapper;
 import run.backend.domain.crew.repository.CrewRepository;
 import run.backend.domain.crew.repository.JoinCrewRepository;
 import run.backend.domain.file.service.FileService;
@@ -49,6 +50,8 @@ public class CrewServiceTest {
     private MemberRepository memberRepository;
 
     @Mock
+    private CrewMapper crewMapper;
+
     private Crew crew;
 
     private Member member;
@@ -58,6 +61,11 @@ public class CrewServiceTest {
     void setUp() {
         member = Member.builder().username("테스트 유저").build();
         request = new CrewInfoRequest("러너스", "러너스 크루입니다.");
+        crew = Crew.builder()
+                .name("테스트 크루")
+                .description("테스트 설명")
+                .image("default-profile-image.png")
+                .build();
     }
 
     @Nested
@@ -85,6 +93,10 @@ public class CrewServiceTest {
             // given
             when(joinCrewRepository.existsByMemberAndJoinStatus(member, JoinStatus.APPROVED))
                     .thenReturn(false);
+            when(fileService.handleImageUpdate(eq("unchanged"), eq("default-profile-image.png"), isNull()))
+                    .thenReturn("default-profile-image.png");
+            when(crewMapper.toEntity(eq("default-profile-image.png"), eq(request.name()), eq(request.description())))
+                    .thenReturn(crew);
             when(crewRepository.save(any(Crew.class))).thenAnswer(invocation -> invocation.getArgument(0));
             when(joinCrewRepository.save(any(JoinCrew.class))).thenReturn(null);
             when(memberRepository.save(any())).thenReturn(member);
@@ -102,6 +114,10 @@ public class CrewServiceTest {
 
             // given
             when(joinCrewRepository.existsByMemberAndJoinStatus(member, JoinStatus.APPROVED)).thenReturn(false);
+            when(fileService.handleImageUpdate(eq("unchanged"), eq("default-profile-image.png"), isNull()))
+                    .thenReturn("default-profile-image.png");
+            when(crewMapper.toEntity(eq("default-profile-image.png"), eq(request.name()), eq(request.description())))
+                    .thenReturn(crew);
             when(crewRepository.save(any(Crew.class))).thenAnswer(invocation -> invocation.getArgument(0));
             when(joinCrewRepository.save(any(JoinCrew.class))).thenReturn(null);
             when(memberRepository.save(any(Member.class))).thenReturn(member);
@@ -119,6 +135,10 @@ public class CrewServiceTest {
 
             // given
             when(joinCrewRepository.existsByMemberAndJoinStatus(member, JoinStatus.APPROVED)).thenReturn(false);
+            when(fileService.handleImageUpdate(eq("unchanged"), eq("default-profile-image.png"), isNull()))
+                    .thenReturn("default-profile-image.png");
+            when(crewMapper.toEntity(eq("default-profile-image.png"), eq(request.name()), eq(request.description())))
+                    .thenReturn(crew);
             when(crewRepository.save(any(Crew.class))).thenAnswer(invocation -> invocation.getArgument(0));
             when(joinCrewRepository.save(any(JoinCrew.class))).thenReturn(null);
             when(memberRepository.save(any(Member.class))).thenReturn(member);
@@ -142,16 +162,18 @@ public class CrewServiceTest {
             // given
             String oldImageName = "old_image.png";
             String newImageName = "new_image.png";
+            MultipartFile mockFile = mock(MultipartFile.class);
+            Crew crew = mock(Crew.class);
 
-            when(crew.getImage()).thenReturn(oldImageName);    // when 안에 Mock 객체
-            when(fileService.saveProfileImage(any())).thenReturn(newImageName);
+            when(crew.getImage()).thenReturn(oldImageName);
+            when(fileService.handleImageUpdate(eq("updated"), eq(oldImageName), eq(mockFile)))
+                    .thenReturn(newImageName);
 
             // when
-            crewService.updateCrew(member, crew, "updated", mock(MultipartFile.class), request);
+            crewService.updateCrew(crew, "updated", mockFile, request);
 
             // then
-            verify(fileService).deleteImage(oldImageName);
-            verify(fileService).saveProfileImage(any());
+            verify(fileService).handleImageUpdate(eq("updated"), eq(oldImageName), eq(mockFile));
             verify(crew).updateImage(newImageName);
             verify(crewRepository).save(crew);
         }
@@ -162,13 +184,18 @@ public class CrewServiceTest {
 
             // given
             String oldImageName = "old_image.png";
+            MultipartFile mockFile = mock(MultipartFile.class);
+            Crew crew = mock(Crew.class);
+
             when(crew.getImage()).thenReturn(oldImageName);
+            when(fileService.handleImageUpdate(eq("removed"), eq(oldImageName), eq(mockFile)))
+                    .thenReturn("default-profile-image.png");
 
             // when
-            crewService.updateCrew(member, crew, "removed", mock(MultipartFile.class), request);
+            crewService.updateCrew(crew, "removed", mockFile, request);
 
             // then
-            verify(fileService).deleteImage(oldImageName);
+            verify(fileService).handleImageUpdate(eq("removed"), eq(oldImageName), eq(mockFile));
             verify(crew).updateImage("default-profile-image.png");
             verify(crewRepository).save(crew);
         }
@@ -177,8 +204,11 @@ public class CrewServiceTest {
         @DisplayName("name이 null이 아니면 이름을 업데이트한다.")
         void updateName_whenNameIsNotNull() {
 
+            // given
+            Crew crew = mock(Crew.class);
+
             // when
-            crewService.updateCrew(member, crew, "unchanged", null, request);
+            crewService.updateCrew(crew, "unchanged", null, request);
 
             // then
             verify(crew).updateName("러너스");
@@ -190,8 +220,11 @@ public class CrewServiceTest {
         @DisplayName("description null이 아니면 설명을 업데이트한다.")
         void updateDescription_whenDescriptionIsNotNull() {
 
+            // given
+            Crew crew = mock(Crew.class);
+
             // when
-            crewService.updateCrew(member, crew, "unchanged", null, request);
+            crewService.updateCrew(crew, "unchanged", null, request);
 
             // then
             verify(crew).updateDescription("러너스 크루입니다.");
