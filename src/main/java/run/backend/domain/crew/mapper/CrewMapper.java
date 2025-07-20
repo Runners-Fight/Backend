@@ -9,6 +9,14 @@ import run.backend.domain.member.entity.Member;
 @Component
 public class CrewMapper {
 
+    public Crew toEntity(String imageName, String name, String description) {
+        return Crew.builder()
+                .image(imageName)
+                .name(name)
+                .description(description)
+                .build();
+    }
+
     public CrewProfileResponse toCrewProfile(Crew crew, Member leader) {
         return CrewProfileResponse.builder()
                 .crewImage(crew.getImage())
