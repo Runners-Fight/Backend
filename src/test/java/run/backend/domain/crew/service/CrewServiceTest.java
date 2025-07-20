@@ -34,7 +34,7 @@ import static org.mockito.Mockito.*;
 public class CrewServiceTest {
 
     @InjectMocks
-    private CrewServiceImpl crewService;
+    private CrewService crewService;
 
     @Mock
     private FileService fileService;
