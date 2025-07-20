@@ -8,9 +8,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import run.backend.domain.crew.dto.common.CrewInviteCodeDto;
 import run.backend.domain.crew.dto.request.CrewInfoRequest;
-import run.backend.domain.crew.dto.response.CrewProfileResponse;
+import run.backend.domain.crew.dto.response.*;
 import run.backend.domain.crew.entity.Crew;
-import run.backend.domain.crew.service.CrewServiceImpl;
+import run.backend.domain.crew.service.CrewEventService;
+import run.backend.domain.crew.service.CrewService;
 import run.backend.domain.member.entity.Member;
 import run.backend.global.annotation.member.Login;
 import run.backend.global.annotation.member.MemberCrew;
@@ -22,7 +23,8 @@ import run.backend.global.common.response.CommonResponse;
 @Tag(name = "Crews", description = "Crew 관련 API")
 public class CrewController {
 
-    private final CrewServiceImpl crewService;
+    private final CrewService crewService;
+    private final CrewEventService crewEventService;
 
     @PostMapping
     @Operation(summary = "크루 생성", description = "크루 생성하는 API 입니다.")
@@ -76,5 +78,47 @@ public class CrewController {
 
         crewService.joinCrew(member, crewId);
         return new CommonResponse<>("크루 가입 성공");
+    }
+
+    @GetMapping
+    @Operation(summary = "크루 기본 정보 조회", description = "크루 기본 정보를 조회하는 API 입니다.")
+    public CommonResponse<CrewBaseInfoResponse> getCrewBaseInfo(@MemberCrew Crew crew) {
+
+        CrewBaseInfoResponse response = crewService.getCrewBaseInfo(crew);
+        return new CommonResponse<>("크루 기본 정보 조회 성공", response);
+    }
+
+    @GetMapping("/events/weekly")
+    @Operation(summary = "weekly 기록 조회", description = "크루의 weekly 기록 조회하는 API 입니다.")
+    public CommonResponse<CrewWeeklyEventResponse> getWeeklyRecord(@MemberCrew Crew crew) {
+
+        CrewWeeklyEventResponse response = crewEventService.getCrewWeeklyEvent(crew);
+        return new CommonResponse<>("크루 주간 기록 조회 성공", response);
+    }
+
+    @GetMapping("/events/monthly")
+    @Operation(summary = "monthly 일정 조회", description = "크루의 monthly 일정 조회하는 API 입니다.")
+    public CommonResponse<CrewMonthlyCanlendarResponse> getMonthlyEvent(
+            @MemberCrew Crew crew,
+            @RequestParam int year,
+            @RequestParam int month) {
+
+        CrewMonthlyCanlendarResponse response = crewEventService.getCrewMonthlyCalendar(crew, year, month);
+        return new CommonResponse<>("크루 월간 기록 조회 성공", response);
+    }
+
+    @GetMapping("/events/upcoming")
+    @Operation(summary = "upcoming 일정 조회", description = "크루의 upcoming 일정 조회하는 API 입니다.")
+    public CommonResponse<CrewUpcomingEventResponse> getUpcomingEvent(@MemberCrew Crew crew) {
+
+        CrewUpcomingEventResponse response = crewEventService.getCrewUpcomingEvent(crew);
+        return new CommonResponse<>("크루 다가오는 일정 조회 성공", response);
+    }
+
+    @GetMapping("/members")
+    @Operation(summary = "크루원 조회", description = "크루 내 모든 크루원을 조회하는 API 입니다.")
+    public CommonResponse<Void> getCrewMember(@MemberCrew Crew crew) {
+
+        return new CommonResponse<>("크루원 조회 성공");
     }
 }
