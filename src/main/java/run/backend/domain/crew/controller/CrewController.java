@@ -43,14 +43,13 @@ public class CrewController {
     @PreAuthorize("hasRole('MANAGER') or hasRole('LEADER')")
     @Operation(summary = "크루 정보 수정", description = "크루 정보 수정하는 API 입니다.")
     public CommonResponse<Void> updateCrewInfo(
-            @Login Member member,
             @MemberCrew Crew crew,
             @RequestParam String imageStatus,
             @RequestPart(value = "data")CrewInfoRequest data,
             @RequestPart(value = "image", required = false) MultipartFile image
     ) {
 
-        crewService.updateCrew(member, crew, imageStatus, image, data);
+        crewService.updateCrew(crew, imageStatus, image, data);
         return new CommonResponse<>("크루 정보 수정 성공");
     }
 

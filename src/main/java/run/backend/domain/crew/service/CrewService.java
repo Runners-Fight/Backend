@@ -36,22 +36,13 @@ public class CrewService {
         if (joinCrewRepository.existsByMemberAndJoinStatus(member, JoinStatus.APPROVED))
             throw new CrewException.AlreadyJoinedCrew();
 
-        // 1. Crew 생성
-        String imageName = "default-profile-image.png";
-        if (imageStatus.equals("updated"))
-            imageName = fileService.saveProfileImage(image);
-        Crew crew = Crew.builder()
-                .image(imageName)
-                .name(data.name())
-                .description(data.description())
-                .build();
+        String imageName = fileService.handleImageUpdate(imageStatus, "default-profile-image.png", image);
+        Crew crew = crewMapper.toEntity(imageName, data.name(), data.description());
         crewRepository.save(crew);
 
-        // 2. JoinCrew 생성
         JoinCrew joinCrew = JoinCrew.createLeaderJoin(member, crew);
         joinCrewRepository.save(joinCrew);
 
-        // 3. Member Role LEADER 로 변경
         member.updateRole(Role.LEADER);
         memberRepository.save(member);
 
@@ -59,25 +50,13 @@ public class CrewService {
     }
 
     @Transactional
-    public void updateCrew(Member member, Crew crew, String imageStatus, MultipartFile image, CrewInfoRequest data) {
+    public void updateCrew(Crew crew, String imageStatus, MultipartFile image, CrewInfoRequest data) {
 
-        switch (imageStatus) {
+        String imageName = fileService.handleImageUpdate(imageStatus, crew.getImage(), image);
+        crew.updateImage(imageName);
 
-            case "updated" :
-                fileService.deleteImage(crew.getImage());
-                String newImageName = fileService.saveProfileImage(image);
-                crew.updateImage(newImageName);
-                break;
-            case "removed" :
-                fileService.deleteImage(crew.getImage());
-                crew.updateImage("default-profile-image.png");
-                break;
-        }
-
-        if (data.name() != null)
-            crew.updateName(data.name());
-        if (data.description() != null)
-            crew.updateDescription(data.description());
+        if (data.name() != null) crew.updateName(data.name());
+        if (data.description() != null) crew.updateDescription(data.description());
 
         crewRepository.save(crew);
     }
