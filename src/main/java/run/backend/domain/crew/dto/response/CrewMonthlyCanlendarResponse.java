@@ -1,9 +1,10 @@
 package run.backend.domain.crew.dto.response;
 
-import java.util.List;
+import run.backend.domain.crew.dto.common.DayStatusDto;
+import java.util.Map;
 
 public record CrewMonthlyCanlendarResponse(
-        List<CrewRecordResponse> records,
-        List<CrewEventResponse> events
+
+        Map<Integer, DayStatusDto> monthlyRunningStatus
 ) {
 }
