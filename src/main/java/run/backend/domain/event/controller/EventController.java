@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import run.backend.domain.event.dto.request.EventInfoRequest;
-import run.backend.domain.event.service.EventServiceImpl;
+import run.backend.domain.event.service.EventService;
 import run.backend.domain.member.entity.Member;
 import run.backend.global.annotation.member.Login;
 import run.backend.global.common.response.CommonResponse;
@@ -20,7 +20,7 @@ import run.backend.global.common.response.CommonResponse;
 @Tag(name = "Events", description = "일정 관련 API")
 public class EventController {
     
-    private final EventServiceImpl eventService;
+    private final EventService eventService;
 
     @PostMapping
     @PreAuthorize("hasRole('MANAGER') or hasRole('LEADER')")

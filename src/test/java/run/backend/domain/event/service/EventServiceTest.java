@@ -17,6 +17,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import run.backend.domain.crew.entity.Crew;
 import run.backend.domain.crew.repository.JoinCrewRepository;
 import run.backend.domain.event.dto.request.EventInfoRequest;
@@ -27,6 +29,7 @@ import run.backend.domain.event.entity.PeriodicEvent;
 import run.backend.domain.event.enums.RepeatCycle;
 import run.backend.domain.event.enums.WeekDay;
 import run.backend.domain.event.exception.EventException.InvalidEventCreationRequest;
+import run.backend.domain.event.mapper.EventMapper;
 import run.backend.domain.event.repository.EventRepository;
 import run.backend.domain.event.repository.JoinEventRepository;
 import run.backend.domain.event.repository.PeriodicEventRepository;
@@ -35,8 +38,9 @@ import run.backend.domain.member.enums.Gender;
 import run.backend.domain.member.enums.OAuthType;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("EventServiceImpl")
-class EventServiceImplTest {
+@MockitoSettings(strictness = Strictness.LENIENT)
+@DisplayName("EventService")
+class EventServiceTest {
 
     @Mock
     private EventRepository eventRepository;
@@ -50,13 +54,18 @@ class EventServiceImplTest {
     @Mock
     private JoinEventRepository joinEventRepository;
 
+    @Mock
+    private EventMapper eventMapper;
+
     @InjectMocks
-    private EventServiceImpl sut; // System Under Test
+    private EventService sut; // System Under Test
 
     private Member requestMember;
     private Member runningCaptain;
     private Crew crew;
     private Event savedEvent;
+    private JoinEvent savedJoinEvent;
+    private PeriodicEvent savedPeriodicEvent;
 
     @BeforeEach
     void setUp() {
@@ -64,6 +73,8 @@ class EventServiceImplTest {
         runningCaptain = createMember("러닝캡틴");
         crew = createCrew("테스트크루");
         savedEvent = createEvent();
+        savedJoinEvent = createJoinEvent();
+        savedPeriodicEvent = createPeriodicEvent();
     }
 
     @Nested
@@ -80,8 +91,17 @@ class EventServiceImplTest {
             given(joinCrewRepository.validateEventCreation(any(), any(), any()))
                 .willReturn(Optional.of(validation));
 
+            given(eventMapper.toEvent(any(EventInfoRequest.class), any(Crew.class), any(Member.class)))
+                .willReturn(savedEvent);
+
+            given(eventMapper.toJoinEvent(any(Event.class), any(Member.class)))
+                .willReturn(savedJoinEvent);
+
             given(eventRepository.save(any(Event.class)))
                 .willReturn(savedEvent);
+
+            given(joinEventRepository.save(any(JoinEvent.class)))
+                .willReturn(savedJoinEvent);
 
             // when
             sut.createEvent(request, requestMember);
@@ -102,8 +122,23 @@ class EventServiceImplTest {
             given(joinCrewRepository.validateEventCreation(any(), any(), any()))
                 .willReturn(Optional.of(validation));
 
+            given(eventMapper.toPeriodicEvent(any(EventInfoRequest.class), any(Crew.class), any(Member.class)))
+                .willReturn(savedPeriodicEvent);
+
+            given(eventMapper.toEvent(any(EventInfoRequest.class), any(Crew.class), any(Member.class)))
+                .willReturn(savedEvent);
+
+            given(eventMapper.toJoinEvent(any(Event.class), any(Member.class)))
+                .willReturn(savedJoinEvent);
+
+            given(periodicEventRepository.save(any(PeriodicEvent.class)))
+                .willReturn(savedPeriodicEvent);
+
             given(eventRepository.save(any(Event.class)))
                 .willReturn(savedEvent);
+
+            given(joinEventRepository.save(any(JoinEvent.class)))
+                .willReturn(savedJoinEvent);
 
             // when
             sut.createEvent(request, requestMember);
@@ -142,8 +177,17 @@ class EventServiceImplTest {
             given(joinCrewRepository.validateEventCreation(any(), any(), any()))
                 .willReturn(Optional.of(validation));
 
+            given(eventMapper.toEvent(any(EventInfoRequest.class), any(Crew.class), any(Member.class)))
+                .willReturn(savedEvent);
+
+            given(eventMapper.toJoinEvent(any(Event.class), any(Member.class)))
+                .willReturn(savedJoinEvent);
+
             given(eventRepository.save(any(Event.class)))
                 .willReturn(savedEvent);
+
+            given(joinEventRepository.save(any(JoinEvent.class)))
+                .willReturn(savedJoinEvent);
 
             // when
             sut.createEvent(request, requestMember);
@@ -180,6 +224,23 @@ class EventServiceImplTest {
             .startTime(LocalTime.of(9, 0))
             .endTime(LocalTime.of(10, 0))
             .place("테스트 장소")
+            .crew(crew)
+            .member(runningCaptain)
+            .build();
+    }
+
+    private JoinEvent createJoinEvent() {
+        return JoinEvent.builder()
+            .event(savedEvent)
+            .member(runningCaptain)
+            .build();
+    }
+
+    private PeriodicEvent createPeriodicEvent() {
+        return PeriodicEvent.builder()
+            .baseDate(LocalDate.of(2025, 7, 18))
+            .repeatCycle(RepeatCycle.WEEKLY)
+            .repeatDays(WeekDay.MONDAY)
             .crew(crew)
             .member(runningCaptain)
             .build();
