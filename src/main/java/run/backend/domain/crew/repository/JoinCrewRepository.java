@@ -46,9 +46,16 @@ public interface JoinCrewRepository extends JpaRepository<JoinCrew, Long> {
         @Param("status") JoinStatus status
     );
 
-    boolean existsByMemberIdAndCrewIdAndJoinStatus(
-        Long memberId,
-        Long crewId,
-        JoinStatus joinStatus
+    @Query("""
+        SELECT captainJoin.member
+        FROM JoinCrew captainJoin
+        WHERE captainJoin.member.id = :runningCaptainId
+        AND captainJoin.crew.id = :crewId
+        AND captainJoin.joinStatus = :status
+        """)
+    Optional<Member> findCrewMemberById(
+        @Param("runningCaptainId") Long runningCaptainId,
+        @Param("crewId") Long crewId,
+        @Param("status") JoinStatus status
     );
 }

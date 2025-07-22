@@ -1,5 +1,6 @@
 package run.backend.domain.event.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -19,7 +20,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.test.util.ReflectionTestUtils;
 import run.backend.domain.crew.entity.Crew;
+import run.backend.domain.crew.enums.JoinStatus;
 import run.backend.domain.crew.repository.JoinCrewRepository;
 import run.backend.domain.event.dto.request.EventInfoRequest;
 import run.backend.domain.event.dto.response.EventCreationValidationDto;
@@ -28,6 +31,7 @@ import run.backend.domain.event.entity.JoinEvent;
 import run.backend.domain.event.entity.PeriodicEvent;
 import run.backend.domain.event.enums.RepeatCycle;
 import run.backend.domain.event.enums.WeekDay;
+import run.backend.domain.event.exception.EventException.EventNotFound;
 import run.backend.domain.event.exception.EventException.InvalidEventCreationRequest;
 import run.backend.domain.event.mapper.EventMapper;
 import run.backend.domain.event.repository.EventRepository;
@@ -69,8 +73,8 @@ class EventServiceTest {
 
     @BeforeEach
     void setUp() {
-        requestMember = createMember("요청자");
-        runningCaptain = createMember("러닝캡틴");
+        requestMember = createMemberWithId(1L, "요청자");
+        runningCaptain = createMemberWithId(2L, "러닝캡틴");
         crew = createCrew("테스트크루");
         savedEvent = createEvent();
         savedJoinEvent = createJoinEvent();
@@ -86,12 +90,14 @@ class EventServiceTest {
         void shouldCreateSingleEventSuccessfully() {
             // given
             EventInfoRequest request = createSingleEventRequest();
-            EventCreationValidationDto validation = new EventCreationValidationDto(crew, runningCaptain);
+            EventCreationValidationDto validation = new EventCreationValidationDto(crew,
+                runningCaptain);
 
             given(joinCrewRepository.validateEventCreation(any(), any(), any()))
                 .willReturn(Optional.of(validation));
 
-            given(eventMapper.toEvent(any(EventInfoRequest.class), any(Crew.class), any(Member.class)))
+            given(eventMapper.toEvent(any(EventInfoRequest.class), any(Crew.class),
+                any(Member.class)))
                 .willReturn(savedEvent);
 
             given(eventMapper.toJoinEvent(any(Event.class), any(Member.class)))
@@ -117,15 +123,18 @@ class EventServiceTest {
         void shouldCreatePeriodicEventSuccessfully() {
             // given
             EventInfoRequest request = createPeriodicEventRequest();
-            EventCreationValidationDto validation = new EventCreationValidationDto(crew, runningCaptain);
+            EventCreationValidationDto validation = new EventCreationValidationDto(crew,
+                runningCaptain);
 
             given(joinCrewRepository.validateEventCreation(any(), any(), any()))
                 .willReturn(Optional.of(validation));
 
-            given(eventMapper.toPeriodicEvent(any(EventInfoRequest.class), any(Crew.class), any(Member.class)))
+            given(eventMapper.toPeriodicEvent(any(EventInfoRequest.class), any(Crew.class),
+                any(Member.class)))
                 .willReturn(savedPeriodicEvent);
 
-            given(eventMapper.toEvent(any(EventInfoRequest.class), any(Crew.class), any(Member.class)))
+            given(eventMapper.toEvent(any(EventInfoRequest.class), any(Crew.class),
+                any(Member.class)))
                 .willReturn(savedEvent);
 
             given(eventMapper.toJoinEvent(any(Event.class), any(Member.class)))
@@ -172,12 +181,14 @@ class EventServiceTest {
         void shouldAutoJoinRunningCaptainToEvent() {
             // given
             EventInfoRequest request = createSingleEventRequest();
-            EventCreationValidationDto validation = new EventCreationValidationDto(crew, runningCaptain);
+            EventCreationValidationDto validation = new EventCreationValidationDto(crew,
+                runningCaptain);
 
             given(joinCrewRepository.validateEventCreation(any(), any(), any()))
                 .willReturn(Optional.of(validation));
 
-            given(eventMapper.toEvent(any(EventInfoRequest.class), any(Crew.class), any(Member.class)))
+            given(eventMapper.toEvent(any(EventInfoRequest.class), any(Crew.class),
+                any(Member.class)))
                 .willReturn(savedEvent);
 
             given(eventMapper.toJoinEvent(any(Event.class), any(Member.class)))
@@ -197,24 +208,195 @@ class EventServiceTest {
         }
     }
 
-    private Member createMember(String nickname) {
-        return Member.builder()
+    @Nested
+    @DisplayName("updateEvent 메서드는")
+    class UpdateEventTest {
+
+        @Test
+        @DisplayName("기본 정보만 수정할 때 성공한다")
+        void shouldUpdateBasicInfoSuccessfully() {
+            // given
+            EventInfoRequest request = createUpdateEventRequest(null, RepeatCycle.NONE, null, "변경된 제목");
+
+            given(eventRepository.findById(1L)).willReturn(Optional.of(savedEvent));
+            given(periodicEventRepository.findByCrewAndTitleAndTime(any(), any(), any(), any()))
+                .willReturn(Optional.empty());
+
+            // when
+            sut.updateEvent(1L, request, requestMember);
+
+            // then
+            then(eventRepository).should().findById(1L);
+            then(joinEventRepository).should(never()).deleteByEventAndMember(any(), any());
+        }
+
+        @Test
+        @DisplayName("이벤트 필드가 실제로 업데이트되는지 확인한다")
+        void shouldActuallyUpdateEventFields() {
+            // given
+            EventInfoRequest request = new EventInfoRequest(
+                "변경된 제목",
+                LocalDate.of(2025, 7, 20),
+                RepeatCycle.NONE,
+                null,
+                LocalTime.of(14, 0),
+                LocalTime.of(15, 0),
+                "변경된 장소",
+                null
+            );
+
+            given(eventRepository.findById(1L)).willReturn(Optional.of(savedEvent));
+            given(periodicEventRepository.findByCrewAndTitleAndTime(any(), any(), any(), any()))
+                .willReturn(Optional.empty());
+
+            // when
+            sut.updateEvent(1L, request, requestMember);
+
+            // then
+            assertThat(savedEvent.getTitle()).isEqualTo("변경된 제목");
+            assertThat(savedEvent.getDate()).isEqualTo(LocalDate.of(2025, 7, 20));
+            assertThat(savedEvent.getStartTime()).isEqualTo(LocalTime.of(14, 0));
+            assertThat(savedEvent.getEndTime()).isEqualTo(LocalTime.of(15, 0));
+            assertThat(savedEvent.getPlace()).isEqualTo("변경된 장소");
+        }
+
+        @Test
+        @DisplayName("러닝캡틴 변경 시 JoinEvent를 교체한다")
+        void shouldChangeRunningCaptainSuccessfully() {
+            // given
+            Member newRunningCaptain = createMemberWithId(3L, "새러닝캡틴");
+
+            EventInfoRequest request = createUpdateEventRequest(3L, RepeatCycle.NONE, null, "변경된 제목");
+
+            given(eventRepository.findById(1L)).willReturn(Optional.of(savedEvent));
+            given(joinCrewRepository.findCrewMemberById(3L, crew.getId(), JoinStatus.APPROVED))
+                .willReturn(Optional.of(newRunningCaptain));
+            given(eventMapper.toJoinEvent(savedEvent, newRunningCaptain)).willReturn(
+                savedJoinEvent);
+            given(periodicEventRepository.findByCrewAndTitleAndTime(any(), any(), any(), any()))
+                .willReturn(Optional.empty());
+
+            // when
+            sut.updateEvent(1L, request, requestMember);
+
+            // then
+            then(joinEventRepository).should().deleteByEventAndMember(savedEvent, runningCaptain);
+            then(joinEventRepository).should().save(any(JoinEvent.class));
+        }
+
+        @Test
+        @DisplayName("러닝캡틴이 실제로 변경되는지 확인한다")
+        void shouldActuallyChangeRunningCaptain() {
+            // given
+            Member newCaptain = createMemberWithId(3L, "새 러닝캡틴");
+
+            EventInfoRequest request = createUpdateEventRequest(3L, RepeatCycle.NONE, null, "변경된 제목");
+
+            given(eventRepository.findById(1L)).willReturn(Optional.of(savedEvent));
+            given(joinCrewRepository.findCrewMemberById(3L, crew.getId(), JoinStatus.APPROVED))
+                .willReturn(Optional.of(newCaptain));
+            given(eventMapper.toJoinEvent(savedEvent, newCaptain)).willReturn(savedJoinEvent);
+            given(periodicEventRepository.findByCrewAndTitleAndTime(any(), any(), any(), any()))
+                .willReturn(Optional.empty());
+
+            // when
+            sut.updateEvent(1L, request, requestMember);
+
+            // then
+            assertThat(savedEvent.getMember()).isEqualTo(newCaptain);
+        }
+
+        @Test
+        @DisplayName("반복 설정을 추가할 때 PeriodicEvent를 생성한다")
+        void shouldAddPeriodicEventSuccessfully() {
+            // given
+            EventInfoRequest request = createUpdateEventRequest(null, RepeatCycle.WEEKLY, WeekDay.TUESDAY, "반복 일정으로 변경");
+            EventInfoRequest mappedRequest = createPeriodicEventRequest();
+
+            given(eventRepository.findById(1L)).willReturn(Optional.of(savedEvent));
+            given(periodicEventRepository.findByCrewAndTitleAndTime(any(), any(), any(), any()))
+                .willReturn(Optional.empty());
+            given(eventMapper.toEventInfoRequest(request, savedEvent)).willReturn(mappedRequest);
+            given(eventMapper.toPeriodicEvent(mappedRequest, crew, runningCaptain)).willReturn(
+                savedPeriodicEvent);
+
+            // when
+            sut.updateEvent(1L, request, requestMember);
+
+            // then
+            then(periodicEventRepository).should().save(any(PeriodicEvent.class));
+        }
+
+        @Test
+        @DisplayName("반복 설정을 제거할 때 기존 PeriodicEvent를 삭제한다")
+        void shouldRemovePeriodicEventSuccessfully() {
+            // given
+            EventInfoRequest request = createUpdateEventRequest(null, RepeatCycle.NONE, null, "반복 제거");
+
+            given(eventRepository.findById(1L)).willReturn(Optional.of(savedEvent));
+            given(periodicEventRepository.findByCrewAndTitleAndTime(any(), any(), any(), any()))
+                .willReturn(Optional.of(savedPeriodicEvent));
+
+            // when
+            sut.updateEvent(1L, request, requestMember);
+
+            // then
+            then(periodicEventRepository).should().delete(savedPeriodicEvent);
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 일정 수정 시 EventNotFound 예외를 발생시킨다")
+        void shouldThrowEventNotFoundWhenEventDoesNotExist() {
+            // given
+            EventInfoRequest request = createUpdateEventRequest(null, RepeatCycle.NONE, null, "변경된 제목");
+
+            given(eventRepository.findById(1L)).willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> sut.updateEvent(1L, request, requestMember))
+                .isInstanceOf(EventNotFound.class);
+        }
+
+        @Test
+        @DisplayName("새로운 러닝캡틴이 크루원이 아닐 때 InvalidEventCreationRequest 예외를 발생시킨다")
+        void shouldThrowExceptionWhenNewRunningCaptainIsNotCrewMember() {
+            // given
+            EventInfoRequest request = createUpdateEventRequest(3L, RepeatCycle.NONE, null, "변경된 제목");
+
+            given(eventRepository.findById(1L)).willReturn(Optional.of(savedEvent));
+            given(joinCrewRepository.findCrewMemberById(3L, crew.getId(), JoinStatus.APPROVED))
+                .willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> sut.updateEvent(1L, request, requestMember))
+                .isInstanceOf(InvalidEventCreationRequest.class);
+        }
+    }
+
+    private Member createMemberWithId(Long id, String nickname) {
+        Member member = Member.builder()
             .username("test_user")
             .nickname(nickname)
             .gender(Gender.MALE)
             .age(25)
-            .oauthId("oauth_id")
+            .oauthId("oauth_id_" + id)
             .oauthType(OAuthType.GOOGLE)
             .profileImage("profile.jpg")
             .build();
+
+        ReflectionTestUtils.setField(member, "id", id);
+        return member;
     }
 
     private Crew createCrew(String name) {
-        return Crew.builder()
+        Crew crew = Crew.builder()
             .name(name)
             .description("테스트 크루 설명")
             .image("crew.jpg")
             .build();
+
+        ReflectionTestUtils.setField(crew, "id", 1L);
+        return crew;
     }
 
     private Event createEvent() {
@@ -269,6 +451,19 @@ class EventServiceTest {
             LocalTime.of(10, 0),
             "테스트 장소",
             1L
+        );
+    }
+
+    private EventInfoRequest createUpdateEventRequest(Long runningCaptainId, RepeatCycle repeatCycle, WeekDay weekDay, String title) {
+        return new EventInfoRequest(
+            title,
+            LocalDate.of(2025, 7, 19),
+            repeatCycle,
+            weekDay,
+            LocalTime.of(10, 0),
+            LocalTime.of(11, 0),
+            "장소",
+            runningCaptainId
         );
     }
 }

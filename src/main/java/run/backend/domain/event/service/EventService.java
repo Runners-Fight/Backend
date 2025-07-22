@@ -20,8 +20,6 @@ import run.backend.domain.event.repository.EventRepository;
 import run.backend.domain.event.repository.JoinEventRepository;
 import run.backend.domain.event.repository.PeriodicEventRepository;
 import run.backend.domain.member.entity.Member;
-import run.backend.domain.member.exception.MemberException.MemberNotFound;
-import run.backend.domain.member.repository.MemberRepository;
 import run.backend.global.annotation.global.Logging;
 
 @Service
@@ -33,7 +31,6 @@ public class EventService {
     private final PeriodicEventRepository periodicEventRepository;
     private final JoinCrewRepository joinCrewRepository;
     private final JoinEventRepository joinEventRepository;
-    private final MemberRepository memberRepository;
     private final EventMapper eventMapper;
 
     @Transactional
@@ -99,19 +96,13 @@ public class EventService {
             return null;
         }
 
-        boolean isCrewMember = joinCrewRepository
-            .existsByMemberIdAndCrewIdAndJoinStatus(
+        return joinCrewRepository
+            .findCrewMemberById(
                 request.runningCaptainId(),
                 event.getCrew().getId(),
                 JoinStatus.APPROVED
-            );
-
-        if (!isCrewMember) {
-            throw new InvalidEventCreationRequest();
-        }
-
-        return memberRepository.findById(request.runningCaptainId())
-            .orElseThrow(MemberNotFound::new);
+            )
+            .orElseThrow(InvalidEventCreationRequest::new);
     }
 
     private void updateRunningCaptain(Event event, Member newRunningCaptain) {
