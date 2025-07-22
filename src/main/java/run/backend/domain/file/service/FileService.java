@@ -29,6 +29,23 @@ public class FileService {
         "gif");
     private static final long MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
+    public String handleImageUpdate(String imageStatus, String currentImage, MultipartFile image) {
+
+        switch (imageStatus) {
+
+            case "updated":
+                deleteImage(currentImage);
+                return saveProfileImage(image);
+
+            case "removed":
+                deleteImage(currentImage);
+                return "default-profile-image.png";
+
+            default:
+                return currentImage;
+        }
+    }
+
     public void deleteImage(String fileName) {
 
         validateFilename(fileName);
