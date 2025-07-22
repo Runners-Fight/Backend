@@ -56,14 +56,14 @@ public class Event extends BaseEntity {
 
     @Builder
     public Event(
-            String title,
-            LocalDate date,
-            LocalTime startTime,
-            LocalTime endTime,
-            String place,
-            Crew crew,
-            CrewRecord record,
-            Member member
+        String title,
+        LocalDate date,
+        LocalTime startTime,
+        LocalTime endTime,
+        String place,
+        Crew crew,
+        CrewRecord record,
+        Member member
     ) {
         this.title = title;
         this.date = date;
@@ -83,5 +83,33 @@ public class Event extends BaseEntity {
 
     public void incrementActualParticipants() {
         this.actualParticipants++;
+    }
+
+    public void updateEvent(
+        String title,
+        LocalDate date,
+        LocalTime startTime,
+        LocalTime endTime,
+        String place,
+        Member runningCaptain
+    ) {
+        if (title != null) {
+            this.title = title;
+        }
+        if (date != null) {
+            this.date = date;
+        }
+        if (startTime != null) {
+            this.startTime = startTime;
+        }
+        if (endTime != null) {
+            this.endTime = endTime;
+        }
+        if (place != null) {
+            this.place = place;
+        }
+        if (runningCaptain != null) {
+            this.member = runningCaptain;
+        }
     }
 }

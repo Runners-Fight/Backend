@@ -34,4 +34,18 @@ public interface EventMapper {
     EventProfileResponse toEventProfile(Event event);
 
     List<EventProfileResponse> toEventProfileList(List<Event> events);
+
+    default EventInfoRequest toEventInfoRequest(EventInfoRequest updateRequest, Event event) {
+        return new EventInfoRequest(
+            updateRequest.title() != null ? updateRequest.title() : event.getTitle(),
+            updateRequest.baseDate() != null ? updateRequest.baseDate() : event.getDate(),
+            updateRequest.repeatCycle(),
+            updateRequest.repeatDays(),
+            updateRequest.startTime() != null ? updateRequest.startTime() : event.getStartTime(),
+            updateRequest.endTime() != null ? updateRequest.endTime() : event.getEndTime(),
+            updateRequest.place() != null ? updateRequest.place() : event.getPlace(),
+            updateRequest.runningCaptainId() != null ? updateRequest.runningCaptainId()
+                : event.getMember().getId()
+        );
+    }
 }

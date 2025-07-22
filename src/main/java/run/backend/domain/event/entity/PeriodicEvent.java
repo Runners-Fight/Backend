@@ -55,15 +55,15 @@ public class PeriodicEvent extends BaseEntity {
 
     @Builder
     public PeriodicEvent(
-            String title,
-            LocalDate baseDate,
-            RepeatCycle repeatCycle,
-            WeekDay repeatDays,
-            LocalTime startTime,
-            LocalTime endTime,
-            String place,
-            Crew crew,
-            Member member
+        String title,
+        LocalDate baseDate,
+        RepeatCycle repeatCycle,
+        WeekDay repeatDays,
+        LocalTime startTime,
+        LocalTime endTime,
+        String place,
+        Crew crew,
+        Member member
     ) {
         this.title = title;
         this.baseDate = baseDate;
@@ -74,5 +74,41 @@ public class PeriodicEvent extends BaseEntity {
         this.place = place;
         this.crew = crew;
         this.member = member;
+    }
+
+    public void updatePeriodicEvent(
+        String title,
+        LocalDate baseDate,
+        RepeatCycle repeatCycle,
+        WeekDay repeatDays,
+        LocalTime startTime,
+        LocalTime endTime,
+        String place,
+        Member runningCaptain
+    ) {
+        if (title != null) {
+            this.title = title;
+        }
+        if (baseDate != null) {
+            this.baseDate = baseDate;
+        }
+        if (repeatCycle != null) {
+            this.repeatCycle = repeatCycle;
+        }
+        if (repeatDays != null) {
+            this.repeatDays = repeatDays;
+        }
+        if (startTime != null) {
+            this.startTime = startTime;
+        }
+        if (endTime != null) {
+            this.endTime = endTime;
+        }
+        if (place != null) {
+            this.place = place;
+        }
+        if (runningCaptain != null) {
+            this.member = runningCaptain;
+        }
     }
 }

@@ -13,4 +13,10 @@ public class EventException extends CustomException {
             super(EventErrorCode.RUNNING_CAPTAIN_NOT_CREW_MEMBER);
         }
     }
+
+    public static class EventNotFound extends EventException {
+        public EventNotFound() {
+            super(EventErrorCode.EVENT_NOT_FOUND);
+        }
+    }
 }
