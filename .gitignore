@@ -45,3 +45,4 @@ secrets.yml
 src/test/resources/application.yml
 /uploads
 ./scripts
+src/main/generated/**
