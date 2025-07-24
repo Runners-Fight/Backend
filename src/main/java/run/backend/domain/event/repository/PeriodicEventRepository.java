@@ -18,6 +18,7 @@ public interface PeriodicEventRepository extends JpaRepository<PeriodicEvent, Lo
         AND pe.title = :title 
         AND pe.startTime = :startTime 
         AND pe.endTime = :endTime
+        AND pe.deletedAt IS NULL
         """)
     Optional<PeriodicEvent> findByCrewAndTitleAndTime(
         @Param("crew") Crew crew,

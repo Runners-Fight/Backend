@@ -111,4 +111,8 @@ public class PeriodicEvent extends BaseEntity {
             this.member = runningCaptain;
         }
     }
+
+    public void softDelete() {
+        this.setDeletedAt(java.time.LocalDateTime.now());
+    }
 }

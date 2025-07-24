@@ -271,6 +271,8 @@ class EventServiceTest {
             given(eventRepository.findById(1L)).willReturn(Optional.of(savedEvent));
             given(joinCrewRepository.findCrewMemberById(3L, crew.getId(), JoinStatus.APPROVED))
                 .willReturn(Optional.of(newRunningCaptain));
+            given(joinEventRepository.findByEventAndMember(savedEvent, runningCaptain))
+                .willReturn(Optional.of(savedJoinEvent));
             given(eventMapper.toJoinEvent(savedEvent, newRunningCaptain)).willReturn(
                 savedJoinEvent);
             given(periodicEventRepository.findByCrewAndTitleAndTime(any(), any(), any(), any()))
@@ -280,8 +282,10 @@ class EventServiceTest {
             sut.updateEvent(1L, request, requestMember);
 
             // then
-            then(joinEventRepository).should().deleteByEventAndMember(savedEvent, runningCaptain);
+            then(joinEventRepository).should().findByEventAndMember(savedEvent, runningCaptain);
             then(joinEventRepository).should().save(any(JoinEvent.class));
+
+            assertThat(savedJoinEvent.getDeletedAt()).isNotNull();
         }
 
         @Test
@@ -295,6 +299,8 @@ class EventServiceTest {
             given(eventRepository.findById(1L)).willReturn(Optional.of(savedEvent));
             given(joinCrewRepository.findCrewMemberById(3L, crew.getId(), JoinStatus.APPROVED))
                 .willReturn(Optional.of(newCaptain));
+            given(joinEventRepository.findByEventAndMember(savedEvent, runningCaptain))
+                .willReturn(Optional.of(savedJoinEvent));
             given(eventMapper.toJoinEvent(savedEvent, newCaptain)).willReturn(savedJoinEvent);
             given(periodicEventRepository.findByCrewAndTitleAndTime(any(), any(), any(), any()))
                 .willReturn(Optional.empty());
@@ -304,6 +310,7 @@ class EventServiceTest {
 
             // then
             assertThat(savedEvent.getMember()).isEqualTo(newCaptain);
+            assertThat(savedJoinEvent.getDeletedAt()).isNotNull();
         }
 
         @Test
@@ -328,7 +335,7 @@ class EventServiceTest {
         }
 
         @Test
-        @DisplayName("반복 설정을 제거할 때 기존 PeriodicEvent를 삭제한다")
+        @DisplayName("반복 설정을 제거할 때 기존 PeriodicEvent를 soft delete한다")
         void shouldRemovePeriodicEventSuccessfully() {
             // given
             EventInfoRequest request = createUpdateEventRequest(null, RepeatCycle.NONE, null, "반복 제거");
@@ -341,7 +348,7 @@ class EventServiceTest {
             sut.updateEvent(1L, request, requestMember);
 
             // then
-            then(periodicEventRepository).should().delete(savedPeriodicEvent);
+            assertThat(savedPeriodicEvent.getDeletedAt()).isNotNull();
         }
 
         @Test

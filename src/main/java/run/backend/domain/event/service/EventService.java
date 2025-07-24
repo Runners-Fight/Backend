@@ -106,7 +106,8 @@ public class EventService {
     }
 
     private void updateRunningCaptain(Event event, Member newRunningCaptain) {
-        joinEventRepository.deleteByEventAndMember(event, event.getMember());
+        joinEventRepository.findByEventAndMember(event, event.getMember())
+            .ifPresent(JoinEvent::softDelete);
 
         JoinEvent newJoinEvent = eventMapper.toJoinEvent(event, newRunningCaptain);
         joinEventRepository.save(newJoinEvent);
@@ -125,7 +126,7 @@ public class EventService {
         RepeatCycle requestedRepeatCycle = request.repeatCycle();
 
         if (requestedRepeatCycle == null || requestedRepeatCycle == RepeatCycle.NONE) {
-            existingPeriodicEvent.ifPresent(periodicEventRepository::delete);
+            existingPeriodicEvent.ifPresent(PeriodicEvent::softDelete);
         } else {
             if (existingPeriodicEvent.isPresent()) {
                 PeriodicEvent periodicEvent = existingPeriodicEvent.get();
