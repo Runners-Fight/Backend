@@ -34,7 +34,7 @@ public class MemberServiceTest {
     private FileService fileService;
 
     @InjectMocks
-    private MemberServiceImpl memberService;
+    private MemberService memberService;
 
     private Member testMember;
     private Crew testCrew;
