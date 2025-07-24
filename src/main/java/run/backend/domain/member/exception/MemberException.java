@@ -13,4 +13,10 @@ public class MemberException extends CustomException {
             super(MemberErrorCode.MEMBER_NOT_JOINED_CREW);
         }
     }
+
+    public static class MemberNotFound extends MemberException {
+        public MemberNotFound() {
+            super(MemberErrorCode.MEMBER_NOT_FOUND);
+        }
+    }
 }

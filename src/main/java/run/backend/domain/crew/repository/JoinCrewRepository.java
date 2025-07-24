@@ -17,16 +17,16 @@ public interface JoinCrewRepository extends JpaRepository<JoinCrew, Long> {
     boolean existsByMemberAndJoinStatus(Member member, JoinStatus joinStatus);
 
     @Query("""
-    SELECT jc.member
-    FROM JoinCrew jc
-        JOIN Crew c ON jc.crew = c
-    WHERE jc.role = :role
-    """)
+        SELECT jc.member
+        FROM JoinCrew jc
+            JOIN Crew c ON jc.crew = c
+        WHERE jc.role = :role
+        """)
     Member findCrewLeader(@Param("role") Role role, Crew crew);
 
     @Query("SELECT jc FROM JoinCrew jc WHERE jc.member.id = :memberId AND jc.joinStatus = :status")
     Optional<JoinCrew> findByMemberIdAndJoinStatus(@Param("memberId") Long memberId,
-                                                   @Param("status") JoinStatus status);
+        @Param("status") JoinStatus status);
 
     @Query("""
         SELECT new run.backend.domain.event.dto.response.EventCreationValidationDto(
@@ -41,8 +41,21 @@ public interface JoinCrewRepository extends JpaRepository<JoinCrew, Long> {
         AND captainJoin.joinStatus = :status
         """)
     Optional<EventCreationValidationDto> validateEventCreation(
-        @Param("requesterId") Long requesterId, 
+        @Param("requesterId") Long requesterId,
         @Param("runningCaptainId") Long runningCaptainId,
+        @Param("status") JoinStatus status
+    );
+
+    @Query("""
+        SELECT captainJoin.member
+        FROM JoinCrew captainJoin
+        WHERE captainJoin.member.id = :runningCaptainId
+        AND captainJoin.crew.id = :crewId
+        AND captainJoin.joinStatus = :status
+        """)
+    Optional<Member> findCrewMemberById(
+        @Param("runningCaptainId") Long runningCaptainId,
+        @Param("crewId") Long crewId,
         @Param("status") JoinStatus status
     );
 }
