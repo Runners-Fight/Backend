@@ -21,16 +21,16 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    @Operation(summary = "유저 정보 조회", description = "마이페이지 상단 유저 정보를 조회하는 API 입니다.")
     @GetMapping
+    @Operation(summary = "유저 정보 조회", description = "마이페이지 상단 유저 정보를 조회하는 API 입니다.")
     public CommonResponse<MemberInfoResponse> getMemberInfo(@Login Member member) {
 
         MemberInfoResponse response = memberService.getMemberInfo(member);
         return new CommonResponse<>("유저 정보 조회 성공", response);
     }
 
-    @Operation(summary = "유저 정보 수정", description = "마이페이지에서 유저 정보를 수정하는 API 입니다.")
     @PostMapping
+    @Operation(summary = "유저 정보 수정", description = "마이페이지에서 유저 정보를 수정하는 API 입니다.")
     public CommonResponse<Void> updateMemberInfo(
             @Login Member member,
             @RequestParam String imageStatus,
