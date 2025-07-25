@@ -1,5 +1,6 @@
 package run.backend.domain.event.service;
 
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -9,9 +10,12 @@ import run.backend.domain.crew.enums.JoinStatus;
 import run.backend.domain.crew.repository.JoinCrewRepository;
 import run.backend.domain.event.dto.request.EventInfoRequest;
 import run.backend.domain.event.dto.response.EventCreationValidationDto;
+import run.backend.domain.event.dto.response.EventDetailResponse;
+import run.backend.domain.event.dto.response.ParticipantDto;
 import run.backend.domain.event.entity.Event;
 import run.backend.domain.event.entity.JoinEvent;
 import run.backend.domain.event.entity.PeriodicEvent;
+import run.backend.domain.event.enums.EventStatus;
 import run.backend.domain.event.enums.RepeatCycle;
 import run.backend.domain.event.exception.EventException.EventNotFound;
 import run.backend.domain.event.exception.EventException.InvalidEventCreationRequest;
@@ -59,6 +63,8 @@ public class EventService {
         Event event = eventRepository.findById(eventId)
             .orElseThrow(EventNotFound::new);
 
+        // member 매개변수를 검증 로직에서 사용할 수 있도록 추가
+        // 현재는 러닝 캡틴 검증에만 사용하므로 별도 권한 검증은 생략
         Member newRunningCaptain = validateNewRunningCaptain(eventUpdateRequest, event);
 
         if (newRunningCaptain != null && !event.getMember().getId()
@@ -150,5 +156,23 @@ public class EventService {
                 periodicEventRepository.save(newPeriodicEvent);
             }
         }
+    }
+
+    @Logging
+    public EventDetailResponse getEventDetail(Long eventId) {
+        Event event = eventRepository.findById(eventId)
+            .orElseThrow(EventNotFound::new);
+
+        List<JoinEvent> participants = getParticipants(event, event.getStatus());
+
+        List<ParticipantDto> participantDtos = eventMapper.toParticipantDtoList(participants);
+
+        return eventMapper.toEventDetailResponse(event, event.getStatus(), participantDtos);
+    }
+
+    private List<JoinEvent> getParticipants(Event event, EventStatus status) {
+        return status == EventStatus.COMPLETED
+            ? joinEventRepository.findActualParticipantsByEvent(event)
+            : joinEventRepository.findByEventAndNotDeleted(event);
     }
 }
