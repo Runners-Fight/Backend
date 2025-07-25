@@ -223,7 +223,7 @@ class EventServiceTest {
                 .willReturn(Optional.empty());
 
             // when
-            sut.updateEvent(1L, request, requestMember);
+            sut.updateEvent(1L, request);
 
             // then
             then(eventRepository).should().findById(1L);
@@ -250,7 +250,7 @@ class EventServiceTest {
                 .willReturn(Optional.empty());
 
             // when
-            sut.updateEvent(1L, request, requestMember);
+            sut.updateEvent(1L, request);
 
             // then
             assertThat(savedEvent.getTitle()).isEqualTo("변경된 제목");
@@ -279,7 +279,7 @@ class EventServiceTest {
                 .willReturn(Optional.empty());
 
             // when
-            sut.updateEvent(1L, request, requestMember);
+            sut.updateEvent(1L, request);
 
             // then
             then(joinEventRepository).should().findByEventAndMember(savedEvent, runningCaptain);
@@ -306,7 +306,7 @@ class EventServiceTest {
                 .willReturn(Optional.empty());
 
             // when
-            sut.updateEvent(1L, request, requestMember);
+            sut.updateEvent(1L, request);
 
             // then
             assertThat(savedEvent.getMember()).isEqualTo(newCaptain);
@@ -328,7 +328,7 @@ class EventServiceTest {
                 savedPeriodicEvent);
 
             // when
-            sut.updateEvent(1L, request, requestMember);
+            sut.updateEvent(1L, request);
 
             // then
             then(periodicEventRepository).should().save(any(PeriodicEvent.class));
@@ -345,7 +345,7 @@ class EventServiceTest {
                 .willReturn(Optional.of(savedPeriodicEvent));
 
             // when
-            sut.updateEvent(1L, request, requestMember);
+            sut.updateEvent(1L, request);
 
             // then
             assertThat(savedPeriodicEvent.getDeletedAt()).isNotNull();
@@ -360,7 +360,7 @@ class EventServiceTest {
             given(eventRepository.findById(1L)).willReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> sut.updateEvent(1L, request, requestMember))
+            assertThatThrownBy(() -> sut.updateEvent(1L, request))
                 .isInstanceOf(EventNotFound.class);
         }
 
@@ -375,7 +375,7 @@ class EventServiceTest {
                 .willReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> sut.updateEvent(1L, request, requestMember))
+            assertThatThrownBy(() -> sut.updateEvent(1L, request))
                 .isInstanceOf(InvalidEventCreationRequest.class);
         }
     }

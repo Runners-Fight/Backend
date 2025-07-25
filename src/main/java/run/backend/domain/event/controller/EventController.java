@@ -42,11 +42,10 @@ public class EventController {
     @Operation(summary = "일정 수정", description = "러닝 일정을 수정합니다. LEADER 또는 MANAGER 권한이 필요합니다.")
     public CommonResponse<Void> updateEvent(
         @PathVariable Long eventId,
-        @RequestBody EventInfoRequest eventUpdateRequest,
-        @Login Member member
+        @RequestBody EventInfoRequest eventUpdateRequest
     ) {
 
-        eventService.updateEvent(eventId, eventUpdateRequest, member);
+        eventService.updateEvent(eventId, eventUpdateRequest);
         return new CommonResponse<>("러닝 일정 수정 성공");
     }
 
@@ -55,5 +54,12 @@ public class EventController {
     public CommonResponse<EventDetailResponse> getEventDetail(@PathVariable Long eventId) {
         EventDetailResponse response = eventService.getEventDetail(eventId);
         return new CommonResponse<>("러닝 일정 상세 조회 성공", response);
+    }
+
+    @PostMapping("/{eventId}/join-requests")
+    @Operation(summary = "러닝 참여", description = "러닝 일정에 참여 요청합니다")
+    public CommonResponse<Void> joinEvent(@PathVariable Long eventId, @Login Member member) {
+        eventService.joinEvent(eventId, member);
+        return new CommonResponse<>("러닝 참여 요청 완료");
     }
 }

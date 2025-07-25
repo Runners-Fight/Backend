@@ -23,4 +23,5 @@ public interface JoinEventRepository extends JpaRepository<JoinEvent, Long> {
     @Query("SELECT j FROM JoinEvent j WHERE j.event = :event AND j.isRunning = true AND j.deletedAt IS NULL")
     List<JoinEvent> findActualParticipantsByEvent(@Param("event") Event event);
 
+    boolean existsByEventAndMemberAndDeletedAtIsNull(Event event, Member member);
 }

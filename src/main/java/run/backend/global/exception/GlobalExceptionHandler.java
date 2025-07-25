@@ -42,7 +42,8 @@ public class GlobalExceptionHandler {
         FileException.InvalidFileName.class,
         FileException.InvalidFileExtension.class,
         FileException.InvalidFileType.class,
-        CrewException.AlreadyJoinedCrew.class
+        CrewException.AlreadyJoinedCrew.class,
+        EventException.AlreadyJoinedEvent.class
     })
     public ResponseEntity<CommonResponse<Void>> handleConflict(final CustomException e) {
 
