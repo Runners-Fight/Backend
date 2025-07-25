@@ -9,6 +9,7 @@ import static org.mockito.BDDMockito.then;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -68,6 +69,7 @@ class EventServiceTest {
     private Member runningCaptain;
     private Crew crew;
     private Event savedEvent;
+    private Event completedEvent;
     private JoinEvent savedJoinEvent;
     private PeriodicEvent savedPeriodicEvent;
 
@@ -77,6 +79,8 @@ class EventServiceTest {
         runningCaptain = createMemberWithId(2L, "러닝캡틴");
         crew = createCrew("테스트크루");
         savedEvent = createEvent();
+        completedEvent = createEvent();
+        completedEvent.complete();
         savedJoinEvent = createJoinEvent();
         savedPeriodicEvent = createPeriodicEvent();
     }
@@ -472,5 +476,59 @@ class EventServiceTest {
             "장소",
             runningCaptainId
         );
+    }
+
+    @Nested
+    @DisplayName("getEventDetail 메서드는")
+    class GetEventTest {
+        @Test
+        @DisplayName("이벤트 시작 전에는 예정된 모든 참가자를 조회한다")
+        void shouldReturnExpectedParticipantsBeforeEvent() {
+            //given
+            given(eventRepository.findById(1L)).willReturn(Optional.of(savedEvent));
+            given(joinEventRepository.findByEventAndNotDeleted(any())).willReturn(List.of(savedJoinEvent));
+            given(joinEventRepository.findActualParticipantsByEvent(any())).willReturn(List.of(savedJoinEvent));
+
+            //when
+            sut.getEventDetail(1L);
+
+            //then
+            then(eventRepository).should().findById(1L);
+            then(joinEventRepository).should().findByEventAndNotDeleted(any());
+            then(joinEventRepository).should(never()).findActualParticipantsByEvent(any());
+        }
+
+        @Test
+        @DisplayName("이벤트 완료 후에는 실제 참가한 참가자만 조회한다")
+        void shouldReturnActualParticipantsAfterEvent() {
+            //given
+            given(eventRepository.findById(1L)).willReturn(Optional.of(completedEvent));
+            given(joinEventRepository.findByEventAndNotDeleted(any())).willReturn(List.of(savedJoinEvent));
+            given(joinEventRepository.findActualParticipantsByEvent(any())).willReturn(List.of(savedJoinEvent));
+
+            //when
+            sut.getEventDetail(1L);
+
+            //then
+            then(eventRepository).should().findById(1L);
+            then(joinEventRepository).should(never()).findByEventAndNotDeleted(any());
+            then(joinEventRepository).should().findActualParticipantsByEvent(any());
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 이벤트 조회 시 예외를 던진다")
+        void shouldThrowExceptionWhenEventNotFound() {
+            //given
+            given(eventRepository.findById(1L)).willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> sut.getEventDetail(1L))
+                .isInstanceOf(EventNotFound.class);
+
+            //then
+            then(eventRepository).should().findById(1L);
+            then(joinEventRepository).should(never()).findByEventAndNotDeleted(any());
+            then(joinEventRepository).should(never()).findActualParticipantsByEvent(any());
+        }
     }
 }

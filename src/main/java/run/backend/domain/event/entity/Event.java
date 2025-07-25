@@ -109,6 +109,10 @@ public class Event extends BaseEntity {
         }
     }
 
+    public void complete() {
+        this.status = EventStatus.COMPLETED;
+    }
+
     public void updateEvent(
         String title,
         LocalDate date,
