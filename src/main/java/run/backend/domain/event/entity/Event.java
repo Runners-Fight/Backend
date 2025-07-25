@@ -93,8 +93,20 @@ public class Event extends BaseEntity {
         this.expectedParticipants++;
     }
 
+    public void decrementExpectedParticipants() {
+        if (this.expectedParticipants > 0) {
+            this.expectedParticipants--;
+        }
+    }
+
     public void incrementActualParticipants() {
         this.actualParticipants++;
+    }
+
+    public void decrementActualParticipants() {
+        if (this.actualParticipants > 0) {
+            this.actualParticipants--;
+        }
     }
 
     public void updateEvent(

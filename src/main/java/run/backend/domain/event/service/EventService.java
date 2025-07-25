@@ -20,6 +20,7 @@ import run.backend.domain.event.enums.RepeatCycle;
 import run.backend.domain.event.exception.EventException.AlreadyJoinedEvent;
 import run.backend.domain.event.exception.EventException.EventNotFound;
 import run.backend.domain.event.exception.EventException.InvalidEventCreationRequest;
+import run.backend.domain.event.exception.EventException.JoinEventNotFound;
 import run.backend.domain.event.mapper.EventMapper;
 import run.backend.domain.event.repository.EventRepository;
 import run.backend.domain.event.repository.JoinEventRepository;
@@ -189,5 +190,20 @@ public class EventService {
         joinEventRepository.save(joinEvent);
 
         event.incrementExpectedParticipants();
+    }
+
+    @Transactional
+    @Logging
+    public void cancelJoinEvent(Long eventId, Member member) {
+        Event event = eventRepository.findById(eventId)
+            .orElseThrow(EventNotFound::new);
+
+        JoinEvent joinEvent = joinEventRepository.findByEventAndMember(event, member)
+            .orElseThrow(JoinEventNotFound::new);
+
+        joinEvent.softDelete();
+        joinEventRepository.save(joinEvent);
+
+        event.decrementExpectedParticipants();
     }
 }

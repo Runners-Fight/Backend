@@ -25,4 +25,11 @@ public class EventException extends CustomException {
             super(EventErrorCode.ALREADY_JOINED_EVENT);
         }
     }
+
+    public static class JoinEventNotFound extends EventException {
+        public JoinEventNotFound() {
+            super(EventErrorCode.JOIN_EVENT_NOT_FOUND);
+        }
+    }
+
 }

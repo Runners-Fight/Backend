@@ -25,7 +25,8 @@ public class GlobalExceptionHandler {
         MemberException.MemberNotJoinedCrew.class,
         MemberException.MemberNotFound.class,
         CrewException.NotFoundCrew.class,
-        EventException.EventNotFound.class
+        EventException.EventNotFound.class,
+        EventException.JoinEventNotFound.class
     })
     public ResponseEntity<CommonResponse<Void>> handleNotFound(final CustomException e) {
 

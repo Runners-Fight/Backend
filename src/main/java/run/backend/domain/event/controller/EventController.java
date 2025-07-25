@@ -3,6 +3,7 @@ package run.backend.domain.event.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -57,9 +58,16 @@ public class EventController {
     }
 
     @PostMapping("/{eventId}/join-requests")
-    @Operation(summary = "러닝 참여", description = "러닝 일정에 참여 요청합니다")
+    @Operation(summary = "러닝 참여 요청", description = "러닝 참여를 요청합니다")
     public CommonResponse<Void> joinEvent(@PathVariable Long eventId, @Login Member member) {
         eventService.joinEvent(eventId, member);
         return new CommonResponse<>("러닝 참여 요청 완료");
+    }
+
+    @DeleteMapping("/{eventId}/join-requests")
+    @Operation(summary = "러닝 참여 요청 취소", description = "러닝 참여 요청을 취소합니다")
+    public CommonResponse<Void> cancelJoinEvent(@PathVariable Long eventId, @Login Member member) {
+        eventService.cancelJoinEvent(eventId, member);
+        return new CommonResponse<>("러닝 참여 요청 취소 완료");
     }
 }
