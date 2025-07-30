@@ -37,18 +37,8 @@ public class MemberService {
     @Transactional
     public void updateMemberInfo(Member member, String imageStatus, MultipartFile image, MemberInfoRequest data) {
 
-        switch (imageStatus) {
-
-            case "updated" :
-                fileService.deleteImage(member.getProfileImage());   // 기존 이미지 지우기
-                String newImageName = fileService.saveProfileImage(image);   // 새로운 이미지 저장
-                member.updateImage(newImageName);
-                break ;
-            case "removed" :
-                fileService.deleteImage(member.getProfileImage());
-                member.updateImage("default-profile-image.png");
-                break ;
-        }
+        String newImageName = fileService.handleImageUpdate(imageStatus, member.getProfileImage(), image);
+        member.updateImage(newImageName);
 
         if (data.gender() != null)
             member.updateGender(data.gender());
