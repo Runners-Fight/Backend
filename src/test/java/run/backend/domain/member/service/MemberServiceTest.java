@@ -10,9 +10,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 import run.backend.domain.crew.entity.Crew;
+import run.backend.domain.crew.entity.JoinCrew;
 import run.backend.domain.crew.enums.JoinStatus;
+import run.backend.domain.crew.repository.JoinCrewRepository;
 import run.backend.domain.file.service.FileService;
 import run.backend.domain.member.dto.request.MemberInfoRequest;
+import run.backend.domain.member.dto.response.MemberCrewStatusResponse;
 import run.backend.domain.member.dto.response.MemberInfoResponse;
 import run.backend.domain.member.entity.Member;
 import run.backend.domain.member.enums.Gender;
@@ -31,7 +34,7 @@ public class MemberServiceTest {
     private MemberRepository memberRepository;
 
     @Mock
-    private FileService fileService;
+    private JoinCrewRepository joinCrewRepository;
 
     @InjectMocks
     private MemberService memberService;
@@ -83,43 +86,32 @@ public class MemberServiceTest {
     }
 
     @Test
-    @DisplayName("회원 정보 수정 - 이미지 업로드")
-    public void updateMemberInfo_whenImageUpdated() {
+    void getMembersCrewExists_shouldReturnNone_whenNoJoinCrew() {
 
-        // given
-        String imageStatus = "updated";
-        String newImagename = "newImage";
-        MultipartFile image = new MockMultipartFile(
-                "newImage",
-                "newImage.png",
-                "image/png",
-                "dummy image content".getBytes());
+        // Given
+        Member member = mock(Member.class);
+        when(joinCrewRepository.findByMember(member)).thenReturn(Optional.empty());
 
-        when(fileService.saveProfileImage(image)).thenReturn(newImagename);
+        // When
+        MemberCrewStatusResponse response = memberService.getMembersCrewExists(member);
 
-        // when
-        memberService.updateMemberInfo(testMember, imageStatus, image, data);
-
-        // then
-        verify(fileService).deleteImage("test image");
-        verify(fileService).saveProfileImage(image);
-        verify(testMember).updateImage(newImagename);
-        verify(memberRepository).save(testMember);
+        // Then
+        assertEquals("NONE", response.status());
     }
 
     @Test
-    @DisplayName("회원 정보 수정 - 이미지 삭제")
-    public void updateMemberInfo_whenImageRemoved() {
+    void getMembersCrewExists_shouldReturnJoinStatus_whenJoinCrewExists() {
 
-        // given
-        String imageStatus = "removed";
+        // Given
+        Member member = mock(Member.class);
+        JoinCrew joinCrew = mock(JoinCrew.class);
+        when(joinCrew.getJoinStatus()).thenReturn(JoinStatus.APPROVED);
+        when(joinCrewRepository.findByMember(member)).thenReturn(Optional.of(joinCrew));
 
-        // when
-        memberService.updateMemberInfo(testMember, imageStatus, null, data);
+        // When
+        MemberCrewStatusResponse response = memberService.getMembersCrewExists(member);
 
-        // then
-        verify(fileService).deleteImage("test image");
-        verify(testMember).updateImage("default-profile-image.png");
-        verify(memberRepository).save(testMember);
+        // Then
+        assertEquals("APPROVED", response.status());
     }
 }
