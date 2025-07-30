@@ -19,8 +19,6 @@ import run.backend.global.annotation.member.MemberCrew;
 import run.backend.global.common.response.CommonResponse;
 import run.backend.global.common.response.PageResponse;
 
-import javax.sound.midi.Synthesizer;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/crews")
@@ -126,5 +124,12 @@ public class CrewController {
 
         PageResponse<CrewRankingResponse> response = crewRankingService.getCrewRanking(page, size);
         return new CommonResponse<>("크루 랭킹 조회 성공", response);
+    }
+
+    @GetMapping("/rankings/status")
+    public CommonResponse<CrewRankingStatusResponse> getCrewRankingsStatus(@MemberCrew Crew crew) {
+
+        CrewRankingStatusResponse response = crewRankingService.getCrewRankingStatus(crew);
+        return new CommonResponse<>("크루 땅따먹기 현황 조회 성공", response);
     }
 }
