@@ -5,8 +5,8 @@ import org.springframework.data.domain.Page;
 import java.util.List;
 
 public record PageResponse<T>(
-        int page,
-        int size,
+        int curPage,
+        int curElements,
         int totalPages,
         long totalElements,
         boolean isLast,
