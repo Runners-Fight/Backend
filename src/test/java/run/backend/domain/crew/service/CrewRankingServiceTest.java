@@ -21,7 +21,6 @@ import run.backend.global.common.response.PageResponse;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @DisplayName("Crew Ranking 서비스 테스트")
