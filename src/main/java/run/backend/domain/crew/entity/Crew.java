@@ -1,10 +1,7 @@
 package run.backend.domain.crew.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import run.backend.global.common.BaseEntity;
 
 import java.math.BigDecimal;
@@ -13,6 +10,7 @@ import java.util.UUID;
 @Entity
 @Getter
 @Table(name = "crews")
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Crew extends BaseEntity {
 
