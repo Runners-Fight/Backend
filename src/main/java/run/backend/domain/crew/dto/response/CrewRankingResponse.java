@@ -4,6 +4,6 @@ public record CrewRankingResponse(
         Long crewId,
         String name,
         String image,
-        int monthlyDistanceKm
+        int monthlyScoreTotal
 ) {
 }
