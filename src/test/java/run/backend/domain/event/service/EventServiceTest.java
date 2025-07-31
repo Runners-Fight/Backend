@@ -32,8 +32,10 @@ import run.backend.domain.event.entity.JoinEvent;
 import run.backend.domain.event.entity.PeriodicEvent;
 import run.backend.domain.event.enums.RepeatCycle;
 import run.backend.domain.event.enums.WeekDay;
+import run.backend.domain.event.exception.EventException.AlreadyJoinedEvent;
 import run.backend.domain.event.exception.EventException.EventNotFound;
 import run.backend.domain.event.exception.EventException.InvalidEventCreationRequest;
+import run.backend.domain.event.exception.EventException.JoinEventNotFound;
 import run.backend.domain.event.mapper.EventMapper;
 import run.backend.domain.event.repository.EventRepository;
 import run.backend.domain.event.repository.JoinEventRepository;
@@ -482,7 +484,7 @@ class EventServiceTest {
     @DisplayName("getEventDetail 메서드는")
     class GetEventTest {
         @Test
-        @DisplayName("이벤트 시작 전에는 예정된 모든 참가자를 조회한다")
+        @DisplayName("일정 시작 전에는 예정된 모든 참가자를 조회한다")
         void shouldReturnExpectedParticipantsBeforeEvent() {
             //given
             given(eventRepository.findById(1L)).willReturn(Optional.of(savedEvent));
@@ -499,7 +501,7 @@ class EventServiceTest {
         }
 
         @Test
-        @DisplayName("이벤트 완료 후에는 실제 참가한 참가자만 조회한다")
+        @DisplayName("일정 완료 후에는 실제 참가한 참가자만 조회한다")
         void shouldReturnActualParticipantsAfterEvent() {
             //given
             given(eventRepository.findById(1L)).willReturn(Optional.of(completedEvent));
@@ -516,7 +518,7 @@ class EventServiceTest {
         }
 
         @Test
-        @DisplayName("존재하지 않는 이벤트 조회 시 예외를 던진다")
+        @DisplayName("존재하지 않는 일정 조회 시 예외를 던진다")
         void shouldThrowExceptionWhenEventNotFound() {
             //given
             given(eventRepository.findById(1L)).willReturn(Optional.empty());
@@ -529,6 +531,106 @@ class EventServiceTest {
             then(eventRepository).should().findById(1L);
             then(joinEventRepository).should(never()).findByEventAndNotDeleted(any());
             then(joinEventRepository).should(never()).findActualParticipantsByEvent(any());
+        }
+    }
+
+    @Nested
+    @DisplayName("joinEvent 메서드는")
+    class JoinEventTest {
+        @Test
+        @DisplayName("일정 참여에 성공한다")
+        void shouldJoinEventSuccessfully() {
+            //given
+            Long initialExpectedParticipants = savedEvent.getExpectedParticipants();
+            
+            given(eventRepository.findById(1L)).willReturn(Optional.of(savedEvent));
+            given(joinEventRepository.save(any())).willReturn(savedJoinEvent);
+            given(joinEventRepository.existsByEventAndMemberAndDeletedAtIsNull(any(),any())).willReturn(false);
+            given(eventMapper.toJoinEvent(any(Event.class), any(Member.class)))
+                .willReturn(savedJoinEvent);
+
+            //when
+            sut.joinEvent(1L, requestMember);
+
+            //then
+            then(eventRepository).should().findById(1L);
+            then(joinEventRepository).should().save(any());
+            assertThat(savedEvent.getExpectedParticipants()).isEqualTo(initialExpectedParticipants + 1);
+        }
+
+        @Test
+        @DisplayName("이미 참여한 경우 예외를 던진다")
+        void shouldThrowExceptionWhenAlreadyJoined() {
+            //given
+            Long initialExpectedParticipants = savedEvent.getExpectedParticipants();
+
+            given(eventRepository.findById(1L)).willReturn(Optional.of(savedEvent));
+            given(joinEventRepository.existsByEventAndMemberAndDeletedAtIsNull(any(),any())).willReturn(true);
+
+            //when & then
+            assertThatThrownBy(() -> sut.joinEvent(1L, requestMember))
+                .isInstanceOf(AlreadyJoinedEvent.class);
+            assertThat(savedEvent.getExpectedParticipants()).isEqualTo(initialExpectedParticipants);
+
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 이벤트인 경우 예외를 던진다")
+        void shouldThrowExceptionWhenEventNotFound() {
+            given(eventRepository.findById(1L)).willReturn(Optional.empty());
+
+            //when & then
+            assertThatThrownBy(() -> sut.joinEvent(1L, requestMember))
+                .isInstanceOf(EventNotFound.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("cancelEvent 메서드는")
+    class CancelEventTest {
+        @Test
+        @DisplayName("일정 참여 취소에 성공한다")
+        void shouldCancelEventSuccessfully() {
+            //given
+            Long initialExpectedParticipants = savedEvent.getExpectedParticipants();
+
+            given(eventRepository.findById(1L)).willReturn(Optional.of(savedEvent));
+            given(joinEventRepository.save(any())).willReturn(savedJoinEvent);
+            given(joinEventRepository.findByEventAndMember(any(), any())).willReturn(Optional.of(savedJoinEvent));
+
+            //when
+            sut.cancelJoinEvent(1L, requestMember);
+
+            //then
+            then(eventRepository).should().findById(1L);
+            then(joinEventRepository).should().save(any());
+            assertThat(savedEvent.getExpectedParticipants()).isEqualTo(initialExpectedParticipants - 1);
+        }
+
+        @Test
+        @DisplayName("사용자가 참여 중인 일정이 아니면 예외를 던진다")
+        void shouldThrowExceptionWhenNotJoined() {
+            //given
+            Long initialExpectedParticipants = savedEvent.getExpectedParticipants();
+
+            given(eventRepository.findById(1L)).willReturn(Optional.of(savedEvent));
+            given(joinEventRepository.existsByEventAndMemberAndDeletedAtIsNull(any(),any())).willReturn(true);
+
+            //when & then
+            assertThatThrownBy(() -> sut.cancelJoinEvent(1L, requestMember))
+                .isInstanceOf(JoinEventNotFound.class);
+            assertThat(savedEvent.getExpectedParticipants()).isEqualTo(initialExpectedParticipants);
+
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 일정인 경우 예외를 던진다")
+        void shouldThrowExceptionWhenEventNotFound() {
+            given(eventRepository.findById(1L)).willReturn(Optional.empty());
+
+            //when & then
+            assertThatThrownBy(() -> sut.cancelJoinEvent(1L, requestMember))
+                .isInstanceOf(EventNotFound.class);
         }
     }
 }
