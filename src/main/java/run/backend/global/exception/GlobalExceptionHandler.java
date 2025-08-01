@@ -25,7 +25,8 @@ public class GlobalExceptionHandler {
         MemberException.MemberNotJoinedCrew.class,
         MemberException.MemberNotFound.class,
         CrewException.NotFoundCrew.class,
-        EventException.EventNotFound.class
+        EventException.EventNotFound.class,
+        EventException.JoinEventNotFound.class
     })
     public ResponseEntity<CommonResponse<Void>> handleNotFound(final CustomException e) {
 
@@ -42,7 +43,8 @@ public class GlobalExceptionHandler {
         FileException.InvalidFileName.class,
         FileException.InvalidFileExtension.class,
         FileException.InvalidFileType.class,
-        CrewException.AlreadyJoinedCrew.class
+        CrewException.AlreadyJoinedCrew.class,
+        EventException.AlreadyJoinedEvent.class
     })
     public ResponseEntity<CommonResponse<Void>> handleConflict(final CustomException e) {
 

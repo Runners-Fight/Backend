@@ -6,12 +6,15 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import run.backend.domain.member.entity.Member;
+import run.backend.global.common.BaseEntity;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @Table(name = "join_events")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class JoinEvent {
+public class JoinEvent extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,6 +39,9 @@ public class JoinEvent {
         this.isRunning = false;
         this.member = member;
         this.event = event;
-        this.event.incrementExpectedParticipants();
+    }
+
+    public void softDelete() {
+        this.setDeletedAt(LocalDateTime.now());
     }
 }

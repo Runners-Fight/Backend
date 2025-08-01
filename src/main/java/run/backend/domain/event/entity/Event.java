@@ -1,17 +1,26 @@
 package run.backend.domain.event.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import run.backend.domain.crew.entity.Crew;
+import run.backend.domain.event.enums.EventStatus;
 import run.backend.domain.member.entity.Member;
 import run.backend.domain.record.entity.CrewRecord;
 import run.backend.global.common.BaseEntity;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
 
 
 @Entity
@@ -54,6 +63,8 @@ public class Event extends BaseEntity {
     @JoinColumn(name = "running_captain")
     private Member member;
 
+    private EventStatus status;
+
     @Builder
     public Event(
         String title,
@@ -70,19 +81,36 @@ public class Event extends BaseEntity {
         this.startTime = startTime;
         this.endTime = endTime;
         this.place = place;
-        this.expectedParticipants = 0L;
+        this.expectedParticipants = 1L;
         this.actualParticipants = 0L;
         this.crew = crew;
         this.record = record;
         this.member = member;
+        this.status = EventStatus.BEFORE;
     }
 
     public void incrementExpectedParticipants() {
         this.expectedParticipants++;
     }
 
+    public void decrementExpectedParticipants() {
+        if (this.expectedParticipants > 0) {
+            this.expectedParticipants--;
+        }
+    }
+
     public void incrementActualParticipants() {
         this.actualParticipants++;
+    }
+
+    public void decrementActualParticipants() {
+        if (this.actualParticipants > 0) {
+            this.actualParticipants--;
+        }
+    }
+
+    public void complete() {
+        this.status = EventStatus.COMPLETED;
     }
 
     public void updateEvent(
@@ -111,5 +139,23 @@ public class Event extends BaseEntity {
         if (runningCaptain != null) {
             this.member = runningCaptain;
         }
+    }
+    
+    public String getDistanceKm() {
+        if (record != null && record.getDistance() != null) {
+            return record.getDistance().toString();
+        }
+        return "0";
+    }
+    
+    public String getRunningTime() {
+        if (record != null && record.getDurationTime() != null) {
+            long totalSeconds = record.getDurationTime();
+            long hours = totalSeconds / 3600;
+            long minutes = (totalSeconds % 3600) / 60;
+            long seconds = totalSeconds % 60;
+            return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+        }
+        return "00:00:00";
     }
 }

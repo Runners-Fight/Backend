@@ -1,5 +1,6 @@
 package run.backend.domain.event.service;
 
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -9,12 +10,17 @@ import run.backend.domain.crew.enums.JoinStatus;
 import run.backend.domain.crew.repository.JoinCrewRepository;
 import run.backend.domain.event.dto.request.EventInfoRequest;
 import run.backend.domain.event.dto.response.EventCreationValidationDto;
+import run.backend.domain.event.dto.response.EventDetailResponse;
+import run.backend.domain.event.dto.response.ParticipantDto;
 import run.backend.domain.event.entity.Event;
 import run.backend.domain.event.entity.JoinEvent;
 import run.backend.domain.event.entity.PeriodicEvent;
+import run.backend.domain.event.enums.EventStatus;
 import run.backend.domain.event.enums.RepeatCycle;
+import run.backend.domain.event.exception.EventException.AlreadyJoinedEvent;
 import run.backend.domain.event.exception.EventException.EventNotFound;
 import run.backend.domain.event.exception.EventException.InvalidEventCreationRequest;
+import run.backend.domain.event.exception.EventException.JoinEventNotFound;
 import run.backend.domain.event.mapper.EventMapper;
 import run.backend.domain.event.repository.EventRepository;
 import run.backend.domain.event.repository.JoinEventRepository;
@@ -55,7 +61,7 @@ public class EventService {
 
     @Transactional
     @Logging
-    public void updateEvent(Long eventId, EventInfoRequest eventUpdateRequest, Member member) {
+    public void updateEvent(Long eventId, EventInfoRequest eventUpdateRequest) {
         Event event = eventRepository.findById(eventId)
             .orElseThrow(EventNotFound::new);
 
@@ -106,7 +112,8 @@ public class EventService {
     }
 
     private void updateRunningCaptain(Event event, Member newRunningCaptain) {
-        joinEventRepository.deleteByEventAndMember(event, event.getMember());
+        joinEventRepository.findByEventAndMember(event, event.getMember())
+            .ifPresent(JoinEvent::softDelete);
 
         JoinEvent newJoinEvent = eventMapper.toJoinEvent(event, newRunningCaptain);
         joinEventRepository.save(newJoinEvent);
@@ -125,7 +132,7 @@ public class EventService {
         RepeatCycle requestedRepeatCycle = request.repeatCycle();
 
         if (requestedRepeatCycle == null || requestedRepeatCycle == RepeatCycle.NONE) {
-            existingPeriodicEvent.ifPresent(periodicEventRepository::delete);
+            existingPeriodicEvent.ifPresent(PeriodicEvent::softDelete);
         } else {
             if (existingPeriodicEvent.isPresent()) {
                 PeriodicEvent periodicEvent = existingPeriodicEvent.get();
@@ -149,5 +156,54 @@ public class EventService {
                 periodicEventRepository.save(newPeriodicEvent);
             }
         }
+    }
+
+    @Logging
+    public EventDetailResponse getEventDetail(Long eventId) {
+        Event event = eventRepository.findById(eventId)
+            .orElseThrow(EventNotFound::new);
+
+        List<JoinEvent> participants = getParticipants(event, event.getStatus());
+
+        List<ParticipantDto> participantDtos = eventMapper.toParticipantDtoList(participants);
+
+        return eventMapper.toEventDetailResponse(event, event.getStatus(), participantDtos);
+    }
+
+    private List<JoinEvent> getParticipants(Event event, EventStatus status) {
+        return status == EventStatus.COMPLETED
+            ? joinEventRepository.findActualParticipantsByEvent(event)
+            : joinEventRepository.findByEventAndNotDeleted(event);
+    }
+
+    @Transactional
+    @Logging
+    public void joinEvent(Long eventId, Member member) {
+        Event event = eventRepository.findById(eventId)
+            .orElseThrow(EventNotFound::new);
+
+        if (joinEventRepository.existsByEventAndMemberAndDeletedAtIsNull(event, member)) {
+            throw new AlreadyJoinedEvent();
+        }
+
+        JoinEvent joinEvent = eventMapper.toJoinEvent(event, member);
+        joinEventRepository.save(joinEvent);
+
+        event.incrementExpectedParticipants();
+    }
+
+    @Transactional
+    @Logging
+    public void cancelJoinEvent(Long eventId, Member member) {
+        Event event = eventRepository.findById(eventId)
+            .orElseThrow(EventNotFound::new);
+
+        JoinEvent joinEvent = joinEventRepository.findByEventAndMember(event, member)
+            .orElseThrow(JoinEventNotFound::new);
+
+        joinEvent.softDelete();
+        joinEventRepository.save(joinEvent);
+
+        event.decrementExpectedParticipants();
     }
 }
