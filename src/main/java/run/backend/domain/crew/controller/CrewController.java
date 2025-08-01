@@ -8,9 +8,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import run.backend.domain.crew.dto.common.CrewInviteCodeDto;
 import run.backend.domain.crew.dto.request.CrewInfoRequest;
+import run.backend.domain.crew.dto.request.MemberRoleChangeRequest;
 import run.backend.domain.crew.dto.response.*;
 import run.backend.domain.crew.entity.Crew;
 import run.backend.domain.crew.service.CrewEventService;
+import run.backend.domain.crew.service.CrewMemberService;
 import run.backend.domain.crew.service.CrewRankingService;
 import run.backend.domain.crew.service.CrewService;
 import run.backend.domain.member.entity.Member;
@@ -27,6 +29,7 @@ public class CrewController {
 
     private final CrewService crewService;
     private final CrewEventService crewEventService;
+    private final CrewMemberService crewMemberService;
     private final CrewRankingService crewRankingService;
 
     @PostMapping
@@ -131,5 +134,24 @@ public class CrewController {
 
         CrewRankingStatusResponse response = crewRankingService.getCrewRankingStatus(crew);
         return new CommonResponse<>("크루 땅따먹기 현황 조회 성공", response);
+    }
+
+    @GetMapping("/members")
+    @Operation(summary = "크루원 조회", description = "전체 크루원 조회하는 API 입니다.")
+    public CommonResponse<CrewMemberResponse> getCrewMembers(@MemberCrew Crew crew) {
+
+        CrewMemberResponse response = crewMemberService.getCrewMembers(crew);
+        return new CommonResponse<>("크루원 조회 성공", response);
+    }
+
+    @PostMapping("/members/{memberId}/role")
+    @PreAuthorize("hasRole('MANAGER') or hasRole('LEADER')")
+    @Operation(summary = "크루원 역할 변경", description = "크루원 역할 변경하는 API 입니다.")
+    public CommonResponse<Void> updateCrewMemberRole(
+            @PathVariable Long memberId,
+            @RequestBody MemberRoleChangeRequest request
+    ) {
+        crewMemberService.updateCrewMemberRole(memberId, request);
+        return new CommonResponse<>("크루원 역할 변경 성공");
     }
 }
