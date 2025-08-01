@@ -11,11 +11,13 @@ import run.backend.domain.crew.dto.request.CrewInfoRequest;
 import run.backend.domain.crew.dto.response.*;
 import run.backend.domain.crew.entity.Crew;
 import run.backend.domain.crew.service.CrewEventService;
+import run.backend.domain.crew.service.CrewRankingService;
 import run.backend.domain.crew.service.CrewService;
 import run.backend.domain.member.entity.Member;
 import run.backend.global.annotation.member.Login;
 import run.backend.global.annotation.member.MemberCrew;
 import run.backend.global.common.response.CommonResponse;
+import run.backend.global.common.response.PageResponse;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,6 +27,7 @@ public class CrewController {
 
     private final CrewService crewService;
     private final CrewEventService crewEventService;
+    private final CrewRankingService crewRankingService;
 
     @PostMapping
     @Operation(summary = "크루 생성", description = "크루 생성하는 API 입니다.")
@@ -114,10 +117,19 @@ public class CrewController {
         return new CommonResponse<>("크루 다가오는 일정 조회 성공", response);
     }
 
-    @GetMapping("/members")
-    @Operation(summary = "크루원 조회", description = "크루 내 모든 크루원을 조회하는 API 입니다.")
-    public CommonResponse<Void> getCrewMember(@MemberCrew Crew crew) {
+    @GetMapping("/rankings")
+    public CommonResponse<PageResponse<CrewRankingResponse>> getCrewRankings(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
 
-        return new CommonResponse<>("크루원 조회 성공");
+        PageResponse<CrewRankingResponse> response = crewRankingService.getCrewRanking(page, size);
+        return new CommonResponse<>("크루 랭킹 조회 성공", response);
+    }
+
+    @GetMapping("/rankings/status")
+    public CommonResponse<CrewRankingStatusResponse> getCrewRankingsStatus(@MemberCrew Crew crew) {
+
+        CrewRankingStatusResponse response = crewRankingService.getCrewRankingStatus(crew);
+        return new CommonResponse<>("크루 땅따먹기 현황 조회 성공", response);
     }
 }

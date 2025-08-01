@@ -1,10 +1,7 @@
 package run.backend.domain.crew.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import run.backend.global.common.BaseEntity;
 
 import java.math.BigDecimal;
@@ -13,6 +10,7 @@ import java.util.UUID;
 @Entity
 @Getter
 @Table(name = "crews")
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Crew extends BaseEntity {
 
@@ -35,11 +33,14 @@ public class Crew extends BaseEntity {
     @Column(name = "monthly_distance_total")
     private BigDecimal monthlyDistanceTotal;
 
+    @Column(name = "captured_distance_total")
+    private BigDecimal capturedDistanceTotal;
+
     @Column(name = "monthly_time_total")
     private Long monthlyTimeTotal;
 
     @Column(name = "monthly_score_total")
-    private BigDecimal monthlyScoreTotal;
+    private BigDecimal monthlyScoreTotal;   // monthlyDistanceTotal(70%) + capturedDistanceTotal(30%)
 
     public void incrementMemberCount() {
         this.memberCount++;
@@ -69,6 +70,7 @@ public class Crew extends BaseEntity {
         this.inviteCode = UUID.randomUUID().toString();
         this.memberCount = 1L;
         this.monthlyDistanceTotal = BigDecimal.ZERO;
+        this.capturedDistanceTotal = BigDecimal.ZERO;
         this.monthlyTimeTotal = 0L;
         this.monthlyScoreTotal = BigDecimal.ZERO;
     }

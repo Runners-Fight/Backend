@@ -16,6 +16,8 @@ public interface JoinCrewRepository extends JpaRepository<JoinCrew, Long> {
 
     boolean existsByMemberAndJoinStatus(Member member, JoinStatus joinStatus);
 
+    Optional<JoinCrew> findByMember(Member member);
+
     @Query("""
         SELECT jc.member
         FROM JoinCrew jc
