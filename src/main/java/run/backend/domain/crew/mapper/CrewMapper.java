@@ -3,12 +3,12 @@ package run.backend.domain.crew.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
+import run.backend.domain.crew.dto.query.CrewMemberProfileDto;
+import run.backend.domain.crew.dto.query.CrewProfileDto;
 import run.backend.domain.crew.dto.response.*;
 import run.backend.domain.crew.entity.Crew;
 import run.backend.domain.member.entity.Member;
-import run.backend.domain.member.enums.Role;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Mapper(
@@ -25,25 +25,13 @@ public interface CrewMapper {
 
     List<CrewRankingResponse> toCrewRankingResponseList(List<Crew> crews);
 
-    @Mapping(source = "profileImage", target = "image")
-    CrewMemberProfileResponse toCrewMemberProfile(Member member);
+    CrewMemberProfileResponse toCrewMemberProfileResponse(CrewMemberProfileDto dto);
 
-    default CrewMemberResponse toCrewMemberResponse(List<Member> crewMembers) {
-        List<CrewMemberProfileResponse> managers = new ArrayList<>();
-        List<CrewMemberProfileResponse> members = new ArrayList<>();
+    List<CrewMemberProfileResponse> toCrewMemberProfileResponseList(List<CrewMemberProfileDto> dtos);
 
-        for (Member member : crewMembers) {
-            CrewMemberProfileResponse profile = toCrewMemberProfile(member);
+    CrewSearchResponse toCrewSearchResponse(CrewProfileDto dto);
 
-            if (member.getRole() == Role.MEMBER) {
-                members.add(profile);
-            } else {
-                managers.add(profile);
-            }
-        }
-
-        return new CrewMemberResponse(managers, members);
-    }
+    List<CrewSearchResponse> toCrewSearchResponseList(List<CrewProfileDto> dtos);
 
     default Crew toEntity(String imageName, String name, String description) {
         return Crew.builder()
