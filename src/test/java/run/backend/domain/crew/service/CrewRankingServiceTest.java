@@ -84,7 +84,7 @@ public class CrewRankingServiceTest {
                     new CrewRankingResponse(5L, "name5", "image5", 1)
             );
 
-            when(crewRepository.findAllByOrderByMonthlyScoreTotalDesc(PageRequest.of(page, size)))
+            when(crewRepository.findAllByDeletedAtIsNullOrderByMonthlyScoreTotalDesc(PageRequest.of(page, size)))
                     .thenReturn(crewPage);
             when(crewMapper.toCrewRankingResponseList(crewPage.getContent()))
                     .thenReturn(responseList);

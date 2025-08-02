@@ -24,7 +24,7 @@ public class CrewRankingService {
 
     public PageResponse<CrewRankingResponse> getCrewRanking(int page, int size) {
 
-        Page<Crew> pageResult = crewRepository.findAllByOrderByMonthlyScoreTotalDesc(PageRequest.of(page, size));
+        Page<Crew> pageResult = crewRepository.findAllByDeletedAtIsNullOrderByMonthlyScoreTotalDesc(PageRequest.of(page, size));
         List<CrewRankingResponse> content = crewMapper.toCrewRankingResponseList(pageResult.getContent());
 
         return PageResponse.toPageResponse(pageResult, content);

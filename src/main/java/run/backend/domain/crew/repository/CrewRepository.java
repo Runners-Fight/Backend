@@ -11,10 +11,9 @@ import java.util.Optional;
 
 public interface CrewRepository extends JpaRepository<Crew, Long> {
 
-    Optional<Crew> findByInviteCode(String inviteCode);
+    Optional<Crew> findByInviteCodeAndDeletedAtIsNull(String inviteCode);
 
-
-    Page<Crew> findAllByOrderByMonthlyScoreTotalDesc(Pageable pageable);
+    Page<Crew> findAllByDeletedAtIsNullOrderByMonthlyScoreTotalDesc(Pageable pageable);
 
     @Query("""
     SELECT new run.backend.domain.crew.dto.query.CrewProfileDto(
@@ -24,6 +23,7 @@ public interface CrewRepository extends JpaRepository<Crew, Long> {
     )
     FROM Crew c
     WHERE LOWER(c.name) LIKE LOWER(CONCAT('%', :name, '%'))
+    AND c.deletedAt IS NULL
     """)
     Page<CrewProfileDto> findByNameContainingIgnoreCase(String name, Pageable pageable);
 }

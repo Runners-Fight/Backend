@@ -74,7 +74,7 @@ public class CrewService {
 
     public CrewProfileResponse getCrewByInviteCode(String inviteCode) {
 
-        Crew crew = crewRepository.findByInviteCode(inviteCode)
+        Crew crew = crewRepository.findByInviteCodeAndDeletedAtIsNull(inviteCode)
                 .orElseThrow(CrewException.NotFoundCrew::new);
         Member leader = joinCrewRepository.findCrewLeader(Role.LEADER, crew);
 
