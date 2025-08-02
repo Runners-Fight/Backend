@@ -154,4 +154,15 @@ public class CrewController {
         crewMemberService.updateCrewMemberRole(memberId, request);
         return new CommonResponse<>("크루원 역할 변경 성공");
     }
+
+    @GetMapping("/search")
+    @Operation(summary = "크루 검색", description = "크루 이름으로 검색 API 입니다.")
+    public CommonResponse<PageResponse<CrewSearchResponse>> searchCrew(
+            @RequestParam String crewName,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        PageResponse<CrewSearchResponse> response = crewService.searchCrewsByName(crewName, page, size);
+        return new CommonResponse<>("크루 검색 성공", response);
+    }
 }
