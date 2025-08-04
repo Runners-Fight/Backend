@@ -24,10 +24,9 @@ public interface JoinCrewRepository extends JpaRepository<JoinCrew, Long> {
     @Query("""
         SELECT jc.member
         FROM JoinCrew jc
-            JOIN Crew c ON jc.crew = c
-        WHERE jc.role = :role
+        WHERE jc.crew = :crew AND jc.member.role = :role
         """)
-    Member findCrewLeader(@Param("role") Role role, Crew crew);
+    Member findCrewLeader(@Param("role") Role role, @Param("crew") Crew crew);
 
     @Query("SELECT jc FROM JoinCrew jc WHERE jc.member.id = :memberId AND jc.joinStatus = :status")
     Optional<JoinCrew> findByMemberIdAndJoinStatus(@Param("memberId") Long memberId,

@@ -76,13 +76,13 @@ public class CrewController {
     }
 
     @PostMapping("/{crewId}/join")
-    @Operation(summary = "크루 가입", description = "크루 가입하는 API 입니다.")
+    @Operation(summary = "크루 가입 요청", description = "크루 가입 요청하는 API 입니다.")
     public CommonResponse<Void> joinCrew(
             @Login Member member,
             @PathVariable Long crewId) {
 
         crewService.joinCrew(member, crewId);
-        return new CommonResponse<>("크루 가입 성공");
+        return new CommonResponse<>("크루 가입 요청 성공");
     }
 
     @GetMapping

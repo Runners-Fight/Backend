@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 import run.backend.domain.crew.enums.JoinStatus;
 import run.backend.domain.member.entity.Member;
-import run.backend.domain.member.enums.Role;
 import run.backend.global.common.BaseEntity;
 
 import java.time.LocalDate;
@@ -29,10 +28,6 @@ public class JoinCrew extends BaseEntity {
     @Column(name = "join_status")
     private JoinStatus joinStatus;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "crew_role")
-    private Role role;
-
     @Column(name = "joined_date")
     private LocalDate joinedDate;
 
@@ -45,7 +40,6 @@ public class JoinCrew extends BaseEntity {
     private Crew crew;
 
     public void approveJoin() {
-        this.role = Role.MEMBER;
         this.joinedDate = LocalDate.now();
         this.joinStatus = JoinStatus.APPROVED;
     }
@@ -54,7 +48,6 @@ public class JoinCrew extends BaseEntity {
         return JoinCrew.builder()
                 .crew(crew)
                 .member(member)
-                .role(Role.LEADER)
                 .joinStatus(JoinStatus.APPROVED)
                 .joinedDate(LocalDate.now())
                 .build();
@@ -64,7 +57,6 @@ public class JoinCrew extends BaseEntity {
         return JoinCrew.builder()
                 .crew(crew)
                 .member(member)
-                .role(Role.MEMBER)
                 .joinStatus(JoinStatus.APPLIED)
                 .build();
     }
@@ -73,14 +65,12 @@ public class JoinCrew extends BaseEntity {
     private JoinCrew(
             Member member,
             Crew crew,
-            Role role,
             JoinStatus joinStatus,
             LocalDate joinedDate
 
     ) {
         this.crew = crew;
         this.member = member;
-        this.role = role;
         this.joinStatus = joinStatus;
         this.joinedDate = joinedDate;
     }

@@ -48,7 +48,7 @@ public class CrewMapperTest {
         String description = "crew_description";
 
         // when
-        Crew result = crewMapper.toEntity(imageName, name, description);
+        Crew result = crewMapper.toCrewEntity(imageName, name, description);
 
         // then
         assertThat(result.getImage()).isEqualTo(imageName);

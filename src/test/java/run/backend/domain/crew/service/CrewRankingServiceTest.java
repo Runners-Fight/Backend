@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -21,12 +22,14 @@ import run.backend.global.common.response.PageResponse;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 @DisplayName("Crew Ranking 서비스 테스트")
 @ExtendWith(MockitoExtension.class)
 public class CrewRankingServiceTest {
 
+    @Spy
     @InjectMocks
     private CrewRankingService crewRankingService;
 
@@ -110,9 +113,10 @@ public class CrewRankingServiceTest {
         void getCrewRankingStatus_whenValidCrewGiven_thenReturnsStatusResponse() {
 
             // given
-            int rank = 0;
+            int rank = 1;
             CrewRankingStatusResponse expectedResponse = new CrewRankingStatusResponse(rank, 0, 0);
 
+            doReturn(rank).when(crewRankingService).getSingleCrewRanking(crew1.getId());
             when(crewMapper.toCrewRankingStatusResponse(rank, crew1))
                     .thenReturn(expectedResponse);
 
