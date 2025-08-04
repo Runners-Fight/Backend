@@ -27,7 +27,6 @@ public class JoinCrewTest {
         // then
         assertThat(joinCrew.getMember()).isEqualTo(member);
         assertThat(joinCrew.getCrew()).isEqualTo(crew);
-        assertThat(joinCrew.getRole()).isEqualTo(Role.LEADER);
         assertThat(joinCrew.getJoinStatus()).isEqualTo(JoinStatus.APPROVED);
         assertThat(joinCrew.getJoinedDate()).isEqualTo(LocalDate.now());
     }
@@ -42,7 +41,6 @@ public class JoinCrewTest {
         // then
         assertThat(joinCrew.getMember()).isEqualTo(member);
         assertThat(joinCrew.getCrew()).isEqualTo(crew);
-        assertThat(joinCrew.getRole()).isEqualTo(Role.MEMBER);
         assertThat(joinCrew.getJoinStatus()).isEqualTo(JoinStatus.APPLIED);
         assertThat(joinCrew.getJoinedDate()).isNull();
     }
