@@ -3,10 +3,9 @@ package run.backend.domain.crew.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
-import run.backend.domain.crew.dto.response.CrewBaseInfoResponse;
-import run.backend.domain.crew.dto.response.CrewProfileResponse;
-import run.backend.domain.crew.dto.response.CrewRankingResponse;
-import run.backend.domain.crew.dto.response.CrewRankingStatusResponse;
+import run.backend.domain.crew.dto.query.CrewMemberProfileDto;
+import run.backend.domain.crew.dto.query.CrewProfileDto;
+import run.backend.domain.crew.dto.response.*;
 import run.backend.domain.crew.entity.Crew;
 import run.backend.domain.member.entity.Member;
 
@@ -25,6 +24,14 @@ public interface CrewMapper {
     CrewRankingResponse toCrewRankingResponse(Crew crew);
 
     List<CrewRankingResponse> toCrewRankingResponseList(List<Crew> crews);
+
+    CrewMemberProfileResponse toCrewMemberProfileResponse(CrewMemberProfileDto dto);
+
+    List<CrewMemberProfileResponse> toCrewMemberProfileResponseList(List<CrewMemberProfileDto> dtos);
+
+    CrewSearchResponse toCrewSearchResponse(CrewProfileDto dto);
+
+    List<CrewSearchResponse> toCrewSearchResponseList(List<CrewProfileDto> dtos);
 
     default Crew toEntity(String imageName, String name, String description) {
         return Crew.builder()

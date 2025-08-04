@@ -1,10 +1,13 @@
 package run.backend.domain.crew.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import run.backend.domain.crew.dto.common.CrewInviteCodeDto;
+import run.backend.domain.crew.dto.query.CrewProfileDto;
 import run.backend.domain.crew.dto.request.CrewInfoRequest;
 import run.backend.domain.crew.dto.response.*;
 import run.backend.domain.crew.entity.Crew;
@@ -18,6 +21,9 @@ import run.backend.domain.file.service.FileService;
 import run.backend.domain.member.entity.Member;
 import run.backend.domain.member.enums.Role;
 import run.backend.domain.member.repository.MemberRepository;
+import run.backend.global.common.response.PageResponse;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -68,7 +74,7 @@ public class CrewService {
 
     public CrewProfileResponse getCrewByInviteCode(String inviteCode) {
 
-        Crew crew = crewRepository.findByInviteCode(inviteCode)
+        Crew crew = crewRepository.findByInviteCodeAndDeletedAtIsNull(inviteCode)
                 .orElseThrow(CrewException.NotFoundCrew::new);
         Member leader = joinCrewRepository.findCrewLeader(Role.LEADER, crew);
 
@@ -92,5 +98,13 @@ public class CrewService {
         int rank = 0;   // [TODO] : 스케줄링 rank 계산 구현 수정 예정
 
         return crewMapper.toCrewBaseInfo(rank, crew);
+    }
+
+    public PageResponse<CrewSearchResponse> searchCrewsByName(String crewName, int page, int size) {
+
+        Page<CrewProfileDto> crewPage = crewRepository.findByNameContainingIgnoreCase(crewName, PageRequest.of(page, size));
+        List<CrewSearchResponse> content = crewMapper.toCrewSearchResponseList(crewPage.getContent());
+
+        return PageResponse.toPageResponse(crewPage, content);
     }
 }

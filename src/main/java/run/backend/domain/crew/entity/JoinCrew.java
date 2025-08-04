@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
 import run.backend.domain.crew.enums.JoinStatus;
 import run.backend.domain.member.entity.Member;
 import run.backend.domain.member.enums.Role;
@@ -17,6 +18,7 @@ import java.time.LocalDate;
 @Getter
 @Table(name = "join_crews")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE join_crews SET deleted_at = NOW() WHERE id = ?")
 public class JoinCrew extends BaseEntity {
 
     @Id

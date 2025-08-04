@@ -4,11 +4,14 @@ package run.backend.domain.crew.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import run.backend.domain.crew.dto.query.CrewMemberProfileDto;
 import run.backend.domain.crew.entity.Crew;
 import run.backend.domain.crew.entity.JoinCrew;
 import run.backend.domain.crew.enums.JoinStatus;
 import run.backend.domain.member.entity.Member;
 import run.backend.domain.member.enums.Role;
+
+import java.util.List;
 import java.util.Optional;
 import run.backend.domain.event.dto.response.EventCreationValidationDto;
 
@@ -60,4 +63,17 @@ public interface JoinCrewRepository extends JpaRepository<JoinCrew, Long> {
         @Param("crewId") Long crewId,
         @Param("status") JoinStatus status
     );
+
+    @Query("""
+        SELECT new run.backend.domain.crew.dto.query.CrewMemberProfileDto(
+            m.profileImage,
+            m.nickname,
+            m.role
+        )
+        FROM JoinCrew jc
+            JOIN jc.member m
+        WHERE jc.crew.id = :crewId
+        AND jc.joinStatus = :status
+    """)
+    List<CrewMemberProfileDto> findAllCrewMemberByCrewId(@Param("crewId") Long crewId, @Param("status") JoinStatus status);
 }

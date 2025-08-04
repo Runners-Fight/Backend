@@ -2,6 +2,7 @@ package run.backend.domain.crew.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
 import run.backend.global.common.BaseEntity;
 
 import java.math.BigDecimal;
@@ -12,6 +13,7 @@ import java.util.UUID;
 @Table(name = "crews")
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE crews SET deleted_at = NOW() WHERE id = ?")
 public class Crew extends BaseEntity {
 
     @Id
