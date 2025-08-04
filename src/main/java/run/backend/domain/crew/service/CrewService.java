@@ -35,6 +35,7 @@ public class CrewService {
     private final CrewRepository crewRepository;
     private final MemberRepository memberRepository;
     private final JoinCrewRepository joinCrewRepository;
+    private final CrewRankingService crewRankingService;
 
     @Transactional
     public CrewInviteCodeDto createCrew(Member member, String imageStatus, MultipartFile image, CrewInfoRequest data) {
@@ -95,7 +96,7 @@ public class CrewService {
 
     public CrewBaseInfoResponse getCrewBaseInfo(Crew crew) {
 
-        int rank = 0;   // [TODO] : 스케줄링 rank 계산 구현 수정 예정
+        int rank = crewRankingService.getSingleCrewRanking(crew.getId());
 
         return crewMapper.toCrewBaseInfo(rank, crew);
     }

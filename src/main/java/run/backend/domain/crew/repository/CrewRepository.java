@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import run.backend.domain.crew.dto.query.CrewProfileDto;
 import run.backend.domain.crew.entity.Crew;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface CrewRepository extends JpaRepository<Crew, Long> {
@@ -14,6 +15,15 @@ public interface CrewRepository extends JpaRepository<Crew, Long> {
     Optional<Crew> findByInviteCodeAndDeletedAtIsNull(String inviteCode);
 
     Page<Crew> findAllByDeletedAtIsNullOrderByMonthlyScoreTotalDesc(Pageable pageable);
+
+
+    @Query("""
+    SELECT c.id
+    FROM Crew c
+    WHERE c.deletedAt IS NULL
+    ORDER BY c.monthlyScoreTotal DESC
+    """)
+    List<Long> findAllActiveCrewIdsOrderByScoreDesc();
 
     @Query("""
     SELECT new run.backend.domain.crew.dto.query.CrewProfileDto(

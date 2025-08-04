@@ -8,11 +8,13 @@ import org.springframework.transaction.annotation.Transactional;
 import run.backend.domain.crew.dto.response.CrewRankingResponse;
 import run.backend.domain.crew.dto.response.CrewRankingStatusResponse;
 import run.backend.domain.crew.entity.Crew;
+import run.backend.domain.crew.exception.CrewException;
 import run.backend.domain.crew.mapper.CrewMapper;
 import run.backend.domain.crew.repository.CrewRepository;
 import run.backend.global.common.response.PageResponse;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -32,8 +34,19 @@ public class CrewRankingService {
 
     public CrewRankingStatusResponse getCrewRankingStatus(Crew crew) {
 
-        int rank = 0;  // [TODO] : 스케줄링 rank 계산 구현 수정 예정
+        int rank = getSingleCrewRanking(crew.getId());
 
         return crewMapper.toCrewRankingStatusResponse(rank, crew);
+    }
+
+    public int getSingleCrewRanking(Long crewId) {
+
+        List<Long> crewIds = crewRepository.findAllActiveCrewIdsOrderByScoreDesc();
+
+        return IntStream.range(0, crewIds.size())
+                .filter(i -> crewIds.get(i).equals(crewId))
+                .findFirst()
+                .orElseThrow(CrewException.NotFoundCrew::new)
+                + 1;
     }
 }
