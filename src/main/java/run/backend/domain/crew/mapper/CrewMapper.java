@@ -20,6 +20,7 @@ public interface CrewMapper {
     @Mapping(target = "rank", source = "rank")
     CrewBaseInfoResponse toCrewBaseInfo(int rank, Crew crew);
 
+    @Mapping(target = "crewId", source = "crew.id")
     @Mapping(target = "monthlyScoreTotal", expression = "java(crew.getMonthlyScoreTotal().intValue())")
     CrewRankingResponse toCrewRankingResponse(Crew crew);
 
@@ -33,33 +34,21 @@ public interface CrewMapper {
 
     List<CrewSearchResponse> toCrewSearchResponseList(List<CrewProfileDto> dtos);
 
-    default Crew toEntity(String imageName, String name, String description) {
-        return Crew.builder()
-                .image(imageName)
-                .name(name)
-                .description(description)
-                .build();
-    }
+    @Mapping(target = "image", source = "imageName")
+    @Mapping(target = "name", source = "name")
+    @Mapping(target = "description", source = "description")
+    Crew toCrewEntity(String imageName, String name, String description);
 
-    default CrewProfileResponse toCrewProfile(Crew crew, Member leader) {
-        return CrewProfileResponse.builder()
-                .crewImage(crew.getImage())
-                .crewName(crew.getName())
-                .crewDescription(crew.getDescription())
-                .memberCount(crew.getMemberCount())
-                .leaderImage(leader.getProfileImage())
-                .leaderName(leader.getNickname())
-                .build();
-    }
+    @Mapping(target = "crewImage", source = "crew.image")
+    @Mapping(target = "crewName", source = "crew.name")
+    @Mapping(target = "crewDescription", source = "crew.description")
+    @Mapping(target = "memberCount", source = "crew.memberCount")
+    @Mapping(target = "leaderImage", source = "leader.profileImage")
+    @Mapping(target = "leaderName", source = "leader.nickname")
+    CrewProfileResponse toCrewProfile(Crew crew, Member leader);
 
-    default CrewRankingStatusResponse toCrewRankingStatusResponse(
-            int rank,
-            Crew crew
-    ) {
-        return new CrewRankingStatusResponse(
-                rank,
-                crew.getMonthlyDistanceTotal().intValue(),
-                crew.getCapturedDistanceTotal().intValue()
-        );
-    }
+    @Mapping(target = "ranking", source = "rank")
+    @Mapping(target = "totalDistanceKm", expression = "java(crew.getMonthlyDistanceTotal().intValue())")
+    @Mapping(target = "capturedDistanceKm", expression = "java(crew.getCapturedDistanceTotal().intValue())")
+    CrewRankingStatusResponse toCrewRankingStatusResponse(int rank, Crew crew);
 }

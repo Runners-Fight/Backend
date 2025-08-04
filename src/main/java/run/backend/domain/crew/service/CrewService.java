@@ -44,7 +44,7 @@ public class CrewService {
             throw new CrewException.AlreadyJoinedCrew();
 
         String imageName = fileService.handleImageUpdate(imageStatus, "default-profile-image.png", image);
-        Crew crew = crewMapper.toEntity(imageName, data.name(), data.description());
+        Crew crew = crewMapper.toCrewEntity(imageName, data.name(), data.description());
         crewRepository.save(crew);
 
         JoinCrew joinCrew = JoinCrew.createLeaderJoin(member, crew);

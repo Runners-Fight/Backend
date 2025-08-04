@@ -95,7 +95,7 @@ public class CrewServiceTest {
                     .thenReturn(false);
             when(fileService.handleImageUpdate(eq("unchanged"), eq("default-profile-image.png"), isNull()))
                     .thenReturn("default-profile-image.png");
-            when(crewMapper.toEntity(eq("default-profile-image.png"), eq(request.name()), eq(request.description())))
+            when(crewMapper.toCrewEntity(eq("default-profile-image.png"), eq(request.name()), eq(request.description())))
                     .thenReturn(crew);
             when(crewRepository.save(any(Crew.class))).thenAnswer(invocation -> invocation.getArgument(0));
             when(joinCrewRepository.save(any(JoinCrew.class))).thenReturn(null);
@@ -116,7 +116,7 @@ public class CrewServiceTest {
             when(joinCrewRepository.existsByMemberAndJoinStatus(member, JoinStatus.APPROVED)).thenReturn(false);
             when(fileService.handleImageUpdate(eq("unchanged"), eq("default-profile-image.png"), isNull()))
                     .thenReturn("default-profile-image.png");
-            when(crewMapper.toEntity(eq("default-profile-image.png"), eq(request.name()), eq(request.description())))
+            when(crewMapper.toCrewEntity(eq("default-profile-image.png"), eq(request.name()), eq(request.description())))
                     .thenReturn(crew);
             when(crewRepository.save(any(Crew.class))).thenAnswer(invocation -> invocation.getArgument(0));
             when(joinCrewRepository.save(any(JoinCrew.class))).thenReturn(null);
@@ -137,7 +137,7 @@ public class CrewServiceTest {
             when(joinCrewRepository.existsByMemberAndJoinStatus(member, JoinStatus.APPROVED)).thenReturn(false);
             when(fileService.handleImageUpdate(eq("unchanged"), eq("default-profile-image.png"), isNull()))
                     .thenReturn("default-profile-image.png");
-            when(crewMapper.toEntity(eq("default-profile-image.png"), eq(request.name()), eq(request.description())))
+            when(crewMapper.toCrewEntity(eq("default-profile-image.png"), eq(request.name()), eq(request.description())))
                     .thenReturn(crew);
             when(crewRepository.save(any(Crew.class))).thenAnswer(invocation -> invocation.getArgument(0));
             when(joinCrewRepository.save(any(JoinCrew.class))).thenReturn(null);
