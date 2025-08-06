@@ -1,5 +1,6 @@
 package run.backend.domain.event.repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -22,6 +23,12 @@ public interface JoinEventRepository extends JpaRepository<JoinEvent, Long> {
     
     @Query("SELECT j FROM JoinEvent j WHERE j.event = :event AND j.isRunning = true AND j.deletedAt IS NULL")
     List<JoinEvent> findActualParticipantsByEvent(@Param("event") Event event);
+
+    @Query("SELECT j FROM JoinEvent j WHERE j.member = :member AND j.deletedAt IS NULL " +
+           "AND j.event.date >= :startDate AND j.event.date <= :endDate")
+    List<JoinEvent> findMonthlyParticipatedEvents(@Param("member") Member member, 
+                                                  @Param("startDate") LocalDate startDate, 
+                                                  @Param("endDate") LocalDate endDate);
 
     boolean existsByEventAndMemberAndDeletedAtIsNull(Event event, Member member);
 }

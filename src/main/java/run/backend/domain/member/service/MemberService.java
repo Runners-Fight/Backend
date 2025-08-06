@@ -8,13 +8,20 @@ import run.backend.domain.crew.entity.Crew;
 import run.backend.domain.crew.entity.JoinCrew;
 import run.backend.domain.crew.enums.JoinStatus;
 import run.backend.domain.crew.repository.JoinCrewRepository;
+import run.backend.domain.event.entity.JoinEvent;
+import run.backend.domain.event.repository.JoinEventRepository;
 import run.backend.domain.file.service.FileService;
 import run.backend.domain.member.dto.request.MemberInfoRequest;
 import run.backend.domain.member.dto.response.MemberCrewStatusResponse;
 import run.backend.domain.member.dto.response.MemberInfoResponse;
+import run.backend.domain.member.dto.response.MemberParticipatedCountResponse;
 import run.backend.domain.member.entity.Member;
 import run.backend.domain.member.repository.MemberRepository;
+import run.backend.global.dto.DateRange;
+import run.backend.global.util.DateRangeUtil;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -25,6 +32,8 @@ public class MemberService {
     private final FileService fileService;
     private final MemberRepository memberRepository;
     private final JoinCrewRepository joinCrewRepository;
+    private final JoinEventRepository joinEventRepository;
+    private final DateRangeUtil dateRangeUtil;
 
     public MemberInfoResponse getMemberInfo(Member member) {
 
@@ -58,5 +67,17 @@ public class MemberService {
             return new MemberCrewStatusResponse("NONE");
         }
         return new MemberCrewStatusResponse(joinCrew.get().getJoinStatus().toString());
+    }
+
+    public MemberParticipatedCountResponse getMemberParticipatedCount(Member member) {
+
+        LocalDate today = LocalDate.now();
+        DateRange monthRange = dateRangeUtil.getMonthRange(today.getYear(), today.getMonthValue());
+
+        List<JoinEvent> monthlyJoinEvents = joinEventRepository.findMonthlyParticipatedEvents(
+                member, monthRange.start(), monthRange.end());
+
+        String participatedCount = String.valueOf(monthlyJoinEvents.size());
+        return new MemberParticipatedCountResponse(participatedCount);
     }
 }

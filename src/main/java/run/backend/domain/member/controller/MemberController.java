@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import run.backend.domain.member.dto.request.MemberInfoRequest;
 import run.backend.domain.member.dto.response.MemberCrewStatusResponse;
 import run.backend.domain.member.dto.response.MemberInfoResponse;
+import run.backend.domain.member.dto.response.MemberParticipatedCountResponse;
 import run.backend.domain.member.entity.Member;
 import run.backend.domain.member.service.MemberService;
 import run.backend.global.annotation.member.Login;
@@ -47,5 +48,13 @@ public class MemberController {
 
         MemberCrewStatusResponse response = memberService.getMembersCrewExists(member);
         return new CommonResponse<>("유저 크루 가입 여부 조회 완료", response);
+    }
+
+    @GetMapping("/participated/preview")
+    @Operation(summary = "유저의 이번 시즌 참여 횟수 조회", description = "유저가 이번 달에 참여한 러닝 횟수를 조회하는 API 입니다.")
+    public CommonResponse<MemberParticipatedCountResponse> getMemberParticipatedCount(@Login Member member) {
+
+        MemberParticipatedCountResponse response = memberService.getMemberParticipatedCount(member);
+        return new CommonResponse<>("유저의 이번 시즌 참여 횟수 조회 성공", response);
     }
 }
