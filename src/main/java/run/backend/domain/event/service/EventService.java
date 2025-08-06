@@ -113,7 +113,7 @@ public class EventService {
 
     private void updateRunningCaptain(Event event, Member newRunningCaptain) {
         joinEventRepository.findByEventAndMember(event, event.getMember())
-            .ifPresent(JoinEvent::softDelete);
+            .ifPresent(joinEventRepository::delete);
 
         JoinEvent newJoinEvent = eventMapper.toJoinEvent(event, newRunningCaptain);
         joinEventRepository.save(newJoinEvent);
@@ -132,7 +132,7 @@ public class EventService {
         RepeatCycle requestedRepeatCycle = request.repeatCycle();
 
         if (requestedRepeatCycle == null || requestedRepeatCycle == RepeatCycle.NONE) {
-            existingPeriodicEvent.ifPresent(PeriodicEvent::softDelete);
+            existingPeriodicEvent.ifPresent(periodicEventRepository::delete);
         } else {
             if (existingPeriodicEvent.isPresent()) {
                 PeriodicEvent periodicEvent = existingPeriodicEvent.get();
@@ -173,7 +173,7 @@ public class EventService {
     private List<JoinEvent> getParticipants(Event event, EventStatus status) {
         return status == EventStatus.COMPLETED
             ? joinEventRepository.findActualParticipantsByEvent(event)
-            : joinEventRepository.findByEventAndNotDeleted(event);
+            : joinEventRepository.findByEvent(event);
     }
 
     @Transactional
@@ -182,7 +182,7 @@ public class EventService {
         Event event = eventRepository.findById(eventId)
             .orElseThrow(EventNotFound::new);
 
-        if (joinEventRepository.existsByEventAndMemberAndDeletedAtIsNull(event, member)) {
+        if (joinEventRepository.existsByEventAndMember(event, member)) {
             throw new AlreadyJoinedEvent();
         }
 
@@ -201,8 +201,7 @@ public class EventService {
         JoinEvent joinEvent = joinEventRepository.findByEventAndMember(event, member)
             .orElseThrow(JoinEventNotFound::new);
 
-        joinEvent.softDelete();
-        joinEventRepository.save(joinEvent);
+        joinEventRepository.delete(joinEvent);
 
         event.decrementExpectedParticipants();
     }

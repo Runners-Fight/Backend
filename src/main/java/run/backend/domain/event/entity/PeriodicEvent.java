@@ -5,6 +5,8 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 import run.backend.domain.crew.entity.Crew;
 import run.backend.domain.event.enums.RepeatCycle;
 import run.backend.domain.event.enums.WeekDay;
@@ -18,6 +20,8 @@ import java.time.LocalTime;
 @Getter
 @Table(name = "periodic_events")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE periodic_events SET deleted_at = NOW() WHERE id = ?")
+@Where(clause = "deleted_at IS NULL")
 public class PeriodicEvent extends BaseEntity {
 
     @Id
@@ -110,9 +114,5 @@ public class PeriodicEvent extends BaseEntity {
         if (runningCaptain != null) {
             this.member = runningCaptain;
         }
-    }
-
-    public void softDelete() {
-        this.setDeletedAt(java.time.LocalDateTime.now());
     }
 }
