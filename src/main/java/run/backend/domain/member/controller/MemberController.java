@@ -3,8 +3,14 @@ package run.backend.domain.member.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import run.backend.domain.crew.dto.response.CrewUpcomingEventResponse;
 import run.backend.domain.member.dto.request.MemberInfoRequest;
 import run.backend.domain.member.dto.response.MemberCrewStatusResponse;
 import run.backend.domain.member.dto.response.MemberInfoResponse;
@@ -52,9 +58,17 @@ public class MemberController {
 
     @GetMapping("/participated/preview")
     @Operation(summary = "유저의 이번 시즌 참여 횟수 조회", description = "유저가 이번 달에 참여한 러닝 횟수를 조회하는 API 입니다.")
-    public CommonResponse<MemberParticipatedCountResponse> getMemberParticipatedCount(@Login Member member) {
+    public CommonResponse<MemberParticipatedCountResponse> getParticipatedCount(@Login Member member) {
 
-        MemberParticipatedCountResponse response = memberService.getMemberParticipatedCount(member);
+        MemberParticipatedCountResponse response = memberService.getParticipatedEventCount(member);
         return new CommonResponse<>("유저의 이번 시즌 참여 횟수 조회 성공", response);
+    }
+
+    @GetMapping("/participated")
+    @Operation(summary = "유저의 이번 시즌 참여한 러닝 리스트 조회", description = "유저가 이번 시즌에 참여한 러닝 리스트를 조회하는 API 입니다.")
+    public CommonResponse<CrewUpcomingEventResponse> getParticipated(@Login Member member) {
+
+        CrewUpcomingEventResponse response = memberService.getParticipatedEvent(member);
+        return new CommonResponse<>("러닝에 대한 상세 참여 내역 조회 성공", response);
     }
 }

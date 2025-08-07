@@ -1,9 +1,14 @@
 package run.backend.domain.member.service;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import run.backend.domain.crew.dto.response.CrewUpcomingEventResponse;
+import run.backend.domain.crew.dto.response.EventProfileResponse;
 import run.backend.domain.crew.entity.Crew;
 import run.backend.domain.crew.entity.JoinCrew;
 import run.backend.domain.crew.enums.JoinStatus;
@@ -19,10 +24,6 @@ import run.backend.domain.member.entity.Member;
 import run.backend.domain.member.repository.MemberRepository;
 import run.backend.global.dto.DateRange;
 import run.backend.global.util.DateRangeUtil;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -69,7 +70,7 @@ public class MemberService {
         return new MemberCrewStatusResponse(joinCrew.get().getJoinStatus().toString());
     }
 
-    public MemberParticipatedCountResponse getMemberParticipatedCount(Member member) {
+    public MemberParticipatedCountResponse getParticipatedEventCount(Member member) {
 
         LocalDate today = LocalDate.now();
         DateRange monthRange = dateRangeUtil.getMonthRange(today.getYear(), today.getMonthValue());
@@ -79,5 +80,16 @@ public class MemberService {
 
         String participatedCount = String.valueOf(monthlyJoinEvents.size());
         return new MemberParticipatedCountResponse(participatedCount);
+    }
+
+    public CrewUpcomingEventResponse getParticipatedEvent(Member member) {
+
+        LocalDate today = LocalDate.now();
+        DateRange monthRange = dateRangeUtil.getMonthRange(today.getYear(), today.getMonthValue());
+
+        List<EventProfileResponse> eventProfiles = joinEventRepository.findMonthlyCompletedEvents(
+                member, monthRange.start(), monthRange.end());
+
+        return new CrewUpcomingEventResponse(eventProfiles);
     }
 }
