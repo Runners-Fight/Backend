@@ -26,6 +26,7 @@ import run.backend.domain.crew.entity.JoinCrew;
 import run.backend.domain.crew.enums.JoinStatus;
 import run.backend.domain.crew.repository.JoinCrewRepository;
 import run.backend.domain.event.entity.JoinEvent;
+import run.backend.domain.event.enums.EventStatus;
 import run.backend.domain.event.repository.JoinEventRepository;
 import run.backend.domain.member.dto.response.MemberCrewStatusResponse;
 import run.backend.domain.member.dto.response.MemberInfoResponse;
@@ -162,7 +163,7 @@ public class MemberServiceTest {
             given(dateRangeUtil.getMonthRange(today.getYear(), today.getMonthValue()))
                     .willReturn(monthRange);
             given(joinEventRepository.findMonthlyParticipatedEvents(
-                    testMember, monthRange.start(), monthRange.end()))
+                    testMember, monthRange.start(), monthRange.end(), EventStatus.COMPLETED))
                     .willReturn(monthlyJoinEvents);
 
             // when
@@ -185,7 +186,7 @@ public class MemberServiceTest {
             given(dateRangeUtil.getMonthRange(today.getYear(), today.getMonthValue()))
                     .willReturn(monthRange);
             given(joinEventRepository.findMonthlyParticipatedEvents(
-                    testMember, monthRange.start(), monthRange.end()))
+                    testMember, monthRange.start(), monthRange.end(), EventStatus.COMPLETED))
                     .willReturn(List.of());
 
             // when
@@ -217,7 +218,7 @@ public class MemberServiceTest {
             given(dateRangeUtil.getMonthRange(today.getYear(), today.getMonthValue()))
                     .willReturn(monthRange);
             given(joinEventRepository.findMonthlyCompletedEvents(
-                    testMember, monthRange.start(), monthRange.end()))
+                    testMember, monthRange.start(), monthRange.end(), EventStatus.COMPLETED))
                     .willReturn(eventProfiles);
 
             // when
@@ -241,7 +242,7 @@ public class MemberServiceTest {
             given(dateRangeUtil.getMonthRange(today.getYear(), today.getMonthValue()))
                     .willReturn(monthRange);
             given(joinEventRepository.findMonthlyCompletedEvents(
-                    testMember, monthRange.start(), monthRange.end()))
+                    testMember, monthRange.start(), monthRange.end(), EventStatus.COMPLETED))
                     .willReturn(List.of());
 
             // when

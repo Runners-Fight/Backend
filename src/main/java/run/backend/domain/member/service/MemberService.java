@@ -14,6 +14,7 @@ import run.backend.domain.crew.entity.JoinCrew;
 import run.backend.domain.crew.enums.JoinStatus;
 import run.backend.domain.crew.repository.JoinCrewRepository;
 import run.backend.domain.event.entity.JoinEvent;
+import run.backend.domain.event.enums.EventStatus;
 import run.backend.domain.event.repository.JoinEventRepository;
 import run.backend.domain.file.service.FileService;
 import run.backend.domain.member.dto.request.MemberInfoRequest;
@@ -76,7 +77,7 @@ public class MemberService {
         DateRange monthRange = dateRangeUtil.getMonthRange(today.getYear(), today.getMonthValue());
 
         List<JoinEvent> monthlyJoinEvents = joinEventRepository.findMonthlyParticipatedEvents(
-                member, monthRange.start(), monthRange.end());
+                member, monthRange.start(), monthRange.end(), EventStatus.COMPLETED);
 
         Long participatedCount = (long) monthlyJoinEvents.size();
         return new MemberParticipatedCountResponse(participatedCount);
@@ -88,7 +89,7 @@ public class MemberService {
         DateRange monthRange = dateRangeUtil.getMonthRange(today.getYear(), today.getMonthValue());
 
         List<EventProfileResponse> eventProfiles = joinEventRepository.findMonthlyCompletedEvents(
-                member, monthRange.start(), monthRange.end());
+                member, monthRange.start(), monthRange.end(), EventStatus.COMPLETED);
 
         return new EventResponseDto(eventProfiles);
     }
