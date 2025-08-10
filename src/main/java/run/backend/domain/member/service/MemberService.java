@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import run.backend.domain.crew.dto.response.CrewUpcomingEventResponse;
+import run.backend.domain.crew.dto.response.EventResponseDto;
 import run.backend.domain.crew.dto.response.EventProfileResponse;
 import run.backend.domain.crew.entity.Crew;
 import run.backend.domain.crew.entity.JoinCrew;
@@ -82,7 +82,7 @@ public class MemberService {
         return new MemberParticipatedCountResponse(participatedCount);
     }
 
-    public CrewUpcomingEventResponse getParticipatedEvent(Member member) {
+    public EventResponseDto getParticipatedEvent(Member member) {
 
         LocalDate today = LocalDate.now();
         DateRange monthRange = dateRangeUtil.getMonthRange(today.getYear(), today.getMonthValue());
@@ -90,6 +90,6 @@ public class MemberService {
         List<EventProfileResponse> eventProfiles = joinEventRepository.findMonthlyCompletedEvents(
                 member, monthRange.start(), monthRange.end());
 
-        return new CrewUpcomingEventResponse(eventProfiles);
+        return new EventResponseDto(eventProfiles);
     }
 }

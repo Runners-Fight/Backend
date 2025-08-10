@@ -114,9 +114,9 @@ public class CrewController {
 
     @GetMapping("/events/upcoming")
     @Operation(summary = "upcoming 일정 조회", description = "크루의 upcoming 일정 조회하는 API 입니다.")
-    public CommonResponse<CrewUpcomingEventResponse> getUpcomingEvent(@MemberCrew Crew crew) {
+    public CommonResponse<EventResponseDto> getUpcomingEvent(@MemberCrew Crew crew) {
 
-        CrewUpcomingEventResponse response = crewEventService.getCrewUpcomingEvent(crew);
+        EventResponseDto response = crewEventService.getCrewUpcomingEvent(crew);
         return new CommonResponse<>("크루 다가오는 일정 조회 성공", response);
     }
 

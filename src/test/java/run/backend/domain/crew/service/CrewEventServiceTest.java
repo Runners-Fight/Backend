@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import run.backend.domain.crew.dto.common.DayStatusDto;
 import run.backend.domain.crew.dto.response.CrewMonthlyCanlendarResponse;
-import run.backend.domain.crew.dto.response.CrewUpcomingEventResponse;
+import run.backend.domain.crew.dto.response.EventResponseDto;
 import run.backend.domain.crew.dto.response.CrewWeeklyEventResponse;
 import run.backend.domain.crew.dto.response.EventProfileResponse;
 import run.backend.domain.crew.entity.Crew;
@@ -128,7 +128,7 @@ public class CrewEventServiceTest {
         when(eventMapper.toEventProfileList(events)).thenReturn(eventProfiles);
 
         // when
-        CrewUpcomingEventResponse response = crewEventService.getCrewUpcomingEvent(crew);
+        EventResponseDto response = crewEventService.getCrewUpcomingEvent(crew);
 
         // then
         assertThat(response.eventProfiles()).isEqualTo(eventProfiles);

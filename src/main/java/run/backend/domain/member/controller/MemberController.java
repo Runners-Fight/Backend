@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import run.backend.domain.crew.dto.response.CrewUpcomingEventResponse;
+import run.backend.domain.crew.dto.response.EventResponseDto;
 import run.backend.domain.member.dto.request.MemberInfoRequest;
 import run.backend.domain.member.dto.response.MemberCrewStatusResponse;
 import run.backend.domain.member.dto.response.MemberInfoResponse;
@@ -66,9 +66,9 @@ public class MemberController {
 
     @GetMapping("/participated")
     @Operation(summary = "유저의 이번 시즌 참여한 러닝 리스트 조회", description = "유저가 이번 시즌에 참여한 러닝 리스트를 조회하는 API 입니다.")
-    public CommonResponse<CrewUpcomingEventResponse> getParticipated(@Login Member member) {
+    public CommonResponse<EventResponseDto> getParticipated(@Login Member member) {
 
-        CrewUpcomingEventResponse response = memberService.getParticipatedEvent(member);
+        EventResponseDto response = memberService.getParticipatedEvent(member);
         return new CommonResponse<>("러닝에 대한 상세 참여 내역 조회 성공", response);
     }
 }

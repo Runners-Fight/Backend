@@ -29,12 +29,13 @@ public interface JoinEventRepository extends JpaRepository<JoinEvent, Long> {
                                                   @Param("startDate") LocalDate startDate, 
                                                   @Param("endDate") LocalDate endDate);
 
-    @Query("SELECT new run.backend.domain.crew.dto.response.EventProfileResponse(" +
-           "e.id, e.title, e.date, e.startTime, e.endTime, e.expectedParticipants) " +
-           "FROM JoinEvent j JOIN j.event e " +
-           "WHERE j.member = :member " +
-           "AND e.date >= :startDate AND e.date <= :endDate " +
-           "AND e.status = 'COMPLETED' ORDER BY e.date DESC")
+    @Query("""
+        SELECT new run.backend.domain.crew.dto.response.EventProfileResponse(\
+        e.id, e.title, e.date, e.startTime, e.endTime, e.expectedParticipants) \
+        FROM JoinEvent j JOIN j.event e \
+        WHERE j.member = :member \
+        AND e.date >= :startDate AND e.date <= :endDate \
+        AND e.status = 'COMPLETED' ORDER BY e.date DESC""")
     List<EventProfileResponse> findMonthlyCompletedEvents(@Param("member") Member member,
                                                              @Param("startDate") LocalDate startDate, 
                                                              @Param("endDate") LocalDate endDate);

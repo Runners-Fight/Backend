@@ -19,7 +19,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-import run.backend.domain.crew.dto.response.CrewUpcomingEventResponse;
+import run.backend.domain.crew.dto.response.EventResponseDto;
 import run.backend.domain.crew.dto.response.EventProfileResponse;
 import run.backend.domain.crew.entity.Crew;
 import run.backend.domain.crew.entity.JoinCrew;
@@ -221,7 +221,7 @@ public class MemberServiceTest {
                     .willReturn(eventProfiles);
 
             // when
-            CrewUpcomingEventResponse response = sut.getParticipatedEvent(testMember);
+            EventResponseDto response = sut.getParticipatedEvent(testMember);
 
             // then
             assertThat(response.eventProfiles()).hasSize(2);
@@ -245,7 +245,7 @@ public class MemberServiceTest {
                     .willReturn(List.of());
 
             // when
-            CrewUpcomingEventResponse response = sut.getParticipatedEvent(testMember);
+            EventResponseDto response = sut.getParticipatedEvent(testMember);
 
             // then
             assertThat(response.eventProfiles()).isEmpty();
