@@ -233,7 +233,7 @@ class EventServiceTest {
 
             // then
             then(eventRepository).should().findById(1L);
-            then(joinEventRepository).should(never()).deleteByEventAndMember(any(), any());
+            then(joinEventRepository).should(never()).delete(any());
         }
 
         @Test
@@ -289,9 +289,8 @@ class EventServiceTest {
 
             // then
             then(joinEventRepository).should().findByEventAndMember(savedEvent, runningCaptain);
+            then(joinEventRepository).should().delete(savedJoinEvent);
             then(joinEventRepository).should().save(any(JoinEvent.class));
-
-            assertThat(savedJoinEvent.getDeletedAt()).isNotNull();
         }
 
         @Test
@@ -315,8 +314,8 @@ class EventServiceTest {
             sut.updateEvent(1L, request);
 
             // then
+            then(joinEventRepository).should().delete(savedJoinEvent);
             assertThat(savedEvent.getMember()).isEqualTo(newCaptain);
-            assertThat(savedJoinEvent.getDeletedAt()).isNotNull();
         }
 
         @Test
@@ -354,7 +353,7 @@ class EventServiceTest {
             sut.updateEvent(1L, request);
 
             // then
-            assertThat(savedPeriodicEvent.getDeletedAt()).isNotNull();
+            then(periodicEventRepository).should().delete(savedPeriodicEvent);
         }
 
         @Test
@@ -488,7 +487,7 @@ class EventServiceTest {
         void shouldReturnExpectedParticipantsBeforeEvent() {
             //given
             given(eventRepository.findById(1L)).willReturn(Optional.of(savedEvent));
-            given(joinEventRepository.findByEventAndNotDeleted(any())).willReturn(List.of(savedJoinEvent));
+            given(joinEventRepository.findByEvent(any())).willReturn(List.of(savedJoinEvent));
             given(joinEventRepository.findActualParticipantsByEvent(any())).willReturn(List.of(savedJoinEvent));
 
             //when
@@ -496,7 +495,7 @@ class EventServiceTest {
 
             //then
             then(eventRepository).should().findById(1L);
-            then(joinEventRepository).should().findByEventAndNotDeleted(any());
+            then(joinEventRepository).should().findByEvent(any());
             then(joinEventRepository).should(never()).findActualParticipantsByEvent(any());
         }
 
@@ -505,7 +504,7 @@ class EventServiceTest {
         void shouldReturnActualParticipantsAfterEvent() {
             //given
             given(eventRepository.findById(1L)).willReturn(Optional.of(completedEvent));
-            given(joinEventRepository.findByEventAndNotDeleted(any())).willReturn(List.of(savedJoinEvent));
+            given(joinEventRepository.findByEvent(any())).willReturn(List.of(savedJoinEvent));
             given(joinEventRepository.findActualParticipantsByEvent(any())).willReturn(List.of(savedJoinEvent));
 
             //when
@@ -513,7 +512,7 @@ class EventServiceTest {
 
             //then
             then(eventRepository).should().findById(1L);
-            then(joinEventRepository).should(never()).findByEventAndNotDeleted(any());
+            then(joinEventRepository).should(never()).findByEvent(any());
             then(joinEventRepository).should().findActualParticipantsByEvent(any());
         }
 
@@ -529,7 +528,7 @@ class EventServiceTest {
 
             //then
             then(eventRepository).should().findById(1L);
-            then(joinEventRepository).should(never()).findByEventAndNotDeleted(any());
+            then(joinEventRepository).should(never()).findByEvent(any());
             then(joinEventRepository).should(never()).findActualParticipantsByEvent(any());
         }
     }
@@ -545,7 +544,7 @@ class EventServiceTest {
             
             given(eventRepository.findById(1L)).willReturn(Optional.of(savedEvent));
             given(joinEventRepository.save(any())).willReturn(savedJoinEvent);
-            given(joinEventRepository.existsByEventAndMemberAndDeletedAtIsNull(any(),any())).willReturn(false);
+            given(joinEventRepository.existsByEventAndMember(any(),any())).willReturn(false);
             given(eventMapper.toJoinEvent(any(Event.class), any(Member.class)))
                 .willReturn(savedJoinEvent);
 
@@ -565,7 +564,7 @@ class EventServiceTest {
             Long initialExpectedParticipants = savedEvent.getExpectedParticipants();
 
             given(eventRepository.findById(1L)).willReturn(Optional.of(savedEvent));
-            given(joinEventRepository.existsByEventAndMemberAndDeletedAtIsNull(any(),any())).willReturn(true);
+            given(joinEventRepository.existsByEventAndMember(any(),any())).willReturn(true);
 
             //when & then
             assertThatThrownBy(() -> sut.joinEvent(1L, requestMember))
@@ -595,7 +594,6 @@ class EventServiceTest {
             Long initialExpectedParticipants = savedEvent.getExpectedParticipants();
 
             given(eventRepository.findById(1L)).willReturn(Optional.of(savedEvent));
-            given(joinEventRepository.save(any())).willReturn(savedJoinEvent);
             given(joinEventRepository.findByEventAndMember(any(), any())).willReturn(Optional.of(savedJoinEvent));
 
             //when
@@ -603,7 +601,7 @@ class EventServiceTest {
 
             //then
             then(eventRepository).should().findById(1L);
-            then(joinEventRepository).should().save(any());
+            then(joinEventRepository).should().delete(savedJoinEvent);
             assertThat(savedEvent.getExpectedParticipants()).isEqualTo(initialExpectedParticipants - 1);
         }
 
@@ -614,7 +612,7 @@ class EventServiceTest {
             Long initialExpectedParticipants = savedEvent.getExpectedParticipants();
 
             given(eventRepository.findById(1L)).willReturn(Optional.of(savedEvent));
-            given(joinEventRepository.existsByEventAndMemberAndDeletedAtIsNull(any(),any())).willReturn(true);
+            given(joinEventRepository.findByEventAndMember(any(), any())).willReturn(Optional.empty());
 
             //when & then
             assertThatThrownBy(() -> sut.cancelJoinEvent(1L, requestMember))

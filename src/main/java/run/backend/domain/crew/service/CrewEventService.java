@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import run.backend.domain.crew.dto.common.DayStatusDto;
 import run.backend.domain.crew.dto.response.CrewMonthlyCanlendarResponse;
-import run.backend.domain.crew.dto.response.CrewUpcomingEventResponse;
+import run.backend.domain.crew.dto.response.EventResponseDto;
 import run.backend.domain.crew.dto.response.CrewWeeklyEventResponse;
 import run.backend.domain.crew.dto.response.EventProfileResponse;
 import run.backend.domain.crew.entity.Crew;
@@ -52,13 +52,13 @@ public class CrewEventService {
         return new CrewMonthlyCanlendarResponse(statusMap);
     }
 
-    public CrewUpcomingEventResponse getCrewUpcomingEvent(Crew crew) {
+    public EventResponseDto getCrewUpcomingEvent(Crew crew) {
 
         LocalDate today = LocalDate.now();
 
         List<Event> events = eventRepository.findAllByCrewAndDateAfter(crew, today);
         List<EventProfileResponse> eventProfiles = eventMapper.toEventProfileList(events);
 
-        return new CrewUpcomingEventResponse(eventProfiles);
+        return new EventResponseDto(eventProfiles);
     }
 }
