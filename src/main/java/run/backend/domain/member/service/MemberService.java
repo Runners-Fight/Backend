@@ -78,7 +78,7 @@ public class MemberService {
         List<JoinEvent> monthlyJoinEvents = joinEventRepository.findMonthlyParticipatedEvents(
                 member, monthRange.start(), monthRange.end());
 
-        String participatedCount = String.valueOf(monthlyJoinEvents.size());
+        Long participatedCount = (long) monthlyJoinEvents.size();
         return new MemberParticipatedCountResponse(participatedCount);
     }
 
