@@ -56,4 +56,8 @@ public class Notification extends BaseEntity {
        this.sender = sender;
        this.receiver = receiver;
     }
+
+    public void markAsRead() {
+        this.isRead = true;
+    }
 }

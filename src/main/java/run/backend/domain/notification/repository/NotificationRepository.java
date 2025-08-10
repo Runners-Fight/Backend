@@ -8,8 +8,11 @@ import run.backend.domain.notification.entity.Notification;
 import run.backend.domain.notification.enums.MessageType;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
+
+    Optional<Notification> findByIdAndReceiver(Long id, Member receiver);
 
     @Query("SELECT n FROM Notification n WHERE n.receiver = :member AND n.isRead = true ORDER BY n.createdAt DESC")
     List<Notification> findReadNotificationsByMember(@Param("member") Member member);

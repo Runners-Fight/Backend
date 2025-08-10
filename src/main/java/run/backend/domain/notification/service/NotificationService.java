@@ -10,6 +10,7 @@ import run.backend.domain.notification.dto.NotificationResponse;
 import run.backend.domain.notification.entity.Notification;
 import run.backend.domain.notification.enums.MessageType;
 import run.backend.domain.notification.exception.NotificationException;
+import run.backend.domain.notification.exception.NotificationException.NotificationNotFound;
 import run.backend.domain.notification.mapper.NotificationMapper;
 import run.backend.domain.notification.repository.NotificationRepository;
 
@@ -39,6 +40,20 @@ public class NotificationService {
         List<NotificationItem> unreadItems = notificationMapper.toNotificationItemList(unreadNotifications);
 
         return new NotificationResponse(readItems, unreadItems);
+    }
+
+    @Transactional
+    public void markAsRead(Long notificationId, Member member) {
+        Notification notification = notificationRepository.findByIdAndReceiver(notificationId, member)
+                .orElseThrow(NotificationNotFound::new);
+
+        notification.markAsRead();
+    }
+
+    @Transactional
+    public void markAllAsRead(Member member) {
+        List<Notification> unreadNotifications = notificationRepository.findUnreadNotificationsByMember(member);
+        unreadNotifications.forEach(Notification::markAsRead);
     }
 
     private MessageType convertStringToMessageType(String type) {

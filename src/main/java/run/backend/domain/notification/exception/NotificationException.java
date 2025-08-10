@@ -13,4 +13,10 @@ public class NotificationException extends CustomException {
             super(NotificationErrorCode.INVALID_NOTIFICATION_TYPE);
         }
     }
+
+    public static class NotificationNotFound extends NotificationException {
+        public NotificationNotFound() {
+            super(NotificationErrorCode.NOTIFICATION_NOT_FOUND);
+        }
+    }
 }
