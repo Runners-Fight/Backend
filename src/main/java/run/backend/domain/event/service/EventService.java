@@ -172,7 +172,7 @@ public class EventService {
 
     private List<JoinEvent> getParticipants(Event event, EventStatus status) {
         return status == EventStatus.COMPLETED
-            ? joinEventRepository.findActualParticipantsByEvent(event)
+            ? joinEventRepository.findActualParticipantsByEvent(event, EventStatus.COMPLETED)
             : joinEventRepository.findByEvent(event);
     }
 

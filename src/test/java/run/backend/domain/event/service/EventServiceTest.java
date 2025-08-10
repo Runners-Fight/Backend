@@ -488,7 +488,7 @@ class EventServiceTest {
             //given
             given(eventRepository.findById(1L)).willReturn(Optional.of(savedEvent));
             given(joinEventRepository.findByEvent(any())).willReturn(List.of(savedJoinEvent));
-            given(joinEventRepository.findActualParticipantsByEvent(any())).willReturn(List.of(savedJoinEvent));
+            given(joinEventRepository.findActualParticipantsByEvent(any(), any())).willReturn(List.of(savedJoinEvent));
 
             //when
             sut.getEventDetail(1L);
@@ -496,7 +496,7 @@ class EventServiceTest {
             //then
             then(eventRepository).should().findById(1L);
             then(joinEventRepository).should().findByEvent(any());
-            then(joinEventRepository).should(never()).findActualParticipantsByEvent(any());
+            then(joinEventRepository).should(never()).findActualParticipantsByEvent(any(), any());
         }
 
         @Test
@@ -505,7 +505,7 @@ class EventServiceTest {
             //given
             given(eventRepository.findById(1L)).willReturn(Optional.of(completedEvent));
             given(joinEventRepository.findByEvent(any())).willReturn(List.of(savedJoinEvent));
-            given(joinEventRepository.findActualParticipantsByEvent(any())).willReturn(List.of(savedJoinEvent));
+            given(joinEventRepository.findActualParticipantsByEvent(any(), any())).willReturn(List.of(savedJoinEvent));
 
             //when
             sut.getEventDetail(1L);
@@ -513,7 +513,7 @@ class EventServiceTest {
             //then
             then(eventRepository).should().findById(1L);
             then(joinEventRepository).should(never()).findByEvent(any());
-            then(joinEventRepository).should().findActualParticipantsByEvent(any());
+            then(joinEventRepository).should().findActualParticipantsByEvent(any(), any());
         }
 
         @Test
@@ -529,7 +529,7 @@ class EventServiceTest {
             //then
             then(eventRepository).should().findById(1L);
             then(joinEventRepository).should(never()).findByEvent(any());
-            then(joinEventRepository).should(never()).findActualParticipantsByEvent(any());
+            then(joinEventRepository).should(never()).findActualParticipantsByEvent(any(), any());
         }
     }
 
