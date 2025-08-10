@@ -36,8 +36,7 @@ public class NotificationController {
     public ResponseEntity<CommonResponse<NotificationResponse>> getNotifications(
             @Parameter(description = "알림 타입 (all, crew, battle)", example = "all")
             @RequestParam(value = "type", defaultValue = "all") String type,
-            
-            @Parameter(hidden = true) @Login Member member
+            @Login Member member
     ) {
         NotificationResponse response = notificationService.getNotifications(member, type);
         return ResponseEntity.ok(new CommonResponse<>("알림 조회 성공", response));
