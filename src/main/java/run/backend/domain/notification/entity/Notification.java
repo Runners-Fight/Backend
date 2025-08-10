@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
 import run.backend.domain.member.entity.Member;
 import run.backend.domain.notification.enums.MessageType;
 import run.backend.global.common.BaseEntity;
@@ -13,6 +14,7 @@ import run.backend.global.common.BaseEntity;
 @Getter
 @Table(name = "notifications")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE notifications SET deleted_at = NOW() WHERE id = ?")
 public class Notification extends BaseEntity {
 
     @Id
