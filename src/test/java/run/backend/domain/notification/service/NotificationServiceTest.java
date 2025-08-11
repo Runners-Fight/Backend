@@ -7,6 +7,7 @@ import static org.mockito.BDDMockito.then;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -26,6 +27,7 @@ import run.backend.domain.notification.dto.NotificationResponse;
 import run.backend.domain.notification.entity.Notification;
 import run.backend.domain.notification.enums.MessageType;
 import run.backend.domain.notification.exception.NotificationException.InvalidNotificationType;
+import run.backend.domain.notification.exception.NotificationException.NotificationNotFound;
 import run.backend.domain.notification.mapper.NotificationMapper;
 import run.backend.domain.notification.repository.NotificationRepository;
 
@@ -222,6 +224,74 @@ class NotificationServiceTest {
 
             then(notificationRepository).shouldHaveNoInteractions();
             then(notificationMapper).shouldHaveNoInteractions();
+        }
+    }
+
+    @Nested
+    @DisplayName("markAsRead 메서드는")
+    class MarkAsReadTest {
+
+        @Test
+        @DisplayName("알림을 읽음 상태로 변경한다")
+        void shouldMarkNotificationAsRead() {
+            // given
+            given(notificationRepository.findByIdAndReceiver(1L, receiver))
+                .willReturn(Optional.of(crewNotification));
+
+            // when
+            sut.markAsRead(1L, receiver);
+
+            // then
+            then(notificationRepository).should().findByIdAndReceiver(1L, receiver);
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 알림이거나 다른 사용자의 알림일 때 NotificationNotFound 예외를 발생시킨다")
+        void shouldThrowNotificationNotFoundWhenNotificationDoesNotExistOrNotOwned() {
+            // given
+            given(notificationRepository.findByIdAndReceiver(999L, receiver))
+                .willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> sut.markAsRead(999L, receiver))
+                .isInstanceOf(NotificationNotFound.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("markAllAsRead 메서드는")
+    class MarkAllAsReadTest {
+
+        @Test
+        @DisplayName("모든 읽지 않은 알림을 읽음 상태로 변경한다")
+        void shouldMarkAllUnreadNotificationsAsRead() {
+            // given
+            List<Notification> unreadNotifications = List.of(crewNotification, battleNotification);
+            
+            given(notificationRepository.findUnreadNotificationsByMember(receiver))
+                .willReturn(unreadNotifications);
+
+            // when
+            sut.markAllAsRead(receiver);
+
+            // then
+            then(notificationRepository).should().findUnreadNotificationsByMember(receiver);
+        }
+
+        @Test
+        @DisplayName("읽지 않은 알림이 없을 때도 정상 처리된다")
+        void shouldHandleEmptyUnreadNotifications() {
+            // given
+            List<Notification> emptyNotifications = List.of();
+            
+            given(notificationRepository.findUnreadNotificationsByMember(receiver))
+                .willReturn(emptyNotifications);
+
+            // when
+            sut.markAllAsRead(receiver);
+
+            // then
+            then(notificationRepository).should().findUnreadNotificationsByMember(receiver);
         }
     }
 
