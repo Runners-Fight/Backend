@@ -5,6 +5,7 @@ import lombok.Getter;
 @Getter
 public enum MessageType {
 
+    ALL("전체"),
     BATTLE("대결"),
     CREW("크루");
 

@@ -11,6 +11,7 @@ import run.backend.domain.crew.exception.CrewException;
 import run.backend.domain.event.exception.EventException;
 import run.backend.domain.file.exception.FileException;
 import run.backend.domain.member.exception.MemberException;
+import run.backend.domain.notification.exception.NotificationException;
 import run.backend.global.common.response.CommonResponse;
 import run.backend.global.exception.httpError.HttpErrorCode;
 
@@ -26,7 +27,8 @@ public class GlobalExceptionHandler {
         MemberException.MemberNotFound.class,
         CrewException.NotFoundCrew.class,
         EventException.EventNotFound.class,
-        EventException.JoinEventNotFound.class
+        EventException.JoinEventNotFound.class,
+        NotificationException.NotificationNotFound.class
     })
     public ResponseEntity<CommonResponse<Void>> handleNotFound(final CustomException e) {
 
@@ -62,7 +64,8 @@ public class GlobalExceptionHandler {
         AuthException.InvalidRefreshToken.class,
         AuthException.RefreshTokenExpired.class,
         FileException.FileUploadFailed.class,
-        EventException.InvalidEventCreationRequest.class
+        EventException.InvalidEventCreationRequest.class,
+        NotificationException.InvalidNotificationType.class
     })
     public ResponseEntity<CommonResponse<Void>> handleBadRequest(final CustomException e) {
 
