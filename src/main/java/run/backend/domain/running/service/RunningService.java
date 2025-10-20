@@ -16,13 +16,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RunningService {
 
-    public static final double SEOUL_AREA_NORTH = 37.8;
-    public static final double SEOUL_AREA_SOUTH = 37.2;
-    public static final double SEOUL_AREA_WEST = 126.5;
-    public static final double SEOUL_AREA_EAST = 127.3;
+    public static final double SEOUL_AREA_NORTH = 37.715133;
+    public static final double SEOUL_AREA_SOUTH = 37.413294;
+    public static final double SEOUL_AREA_WEST = 126.734086;
+    public static final double SEOUL_AREA_EAST = 127.269311;
 
-    public static final int GRID_WIDTH = 1000;
-    public static final int GRID_HEIGHT = 1000;
+    public static final int GRID_WIDTH = 939;
+    public static final int GRID_HEIGHT = 671;
 
     private final PixelRepository pixelRepository;
 
