@@ -34,7 +34,7 @@ public class RunningService {
             int[] pixelPos = toPixel(coord.latitude(), coord.longitude());
             PixelId id = new PixelId(pixelPos[0], pixelPos[1]);
 
-            Pixel pixel = pixelRepository.findById(id)
+            Pixel pixel = pixelRepository.findByIdWithLock(id)
                     .orElseGet(() -> new Pixel(id, crewId, coord.timestamp()));
 
             // 기존 Pixel의 updatedAt이 더 최신이면 skip
