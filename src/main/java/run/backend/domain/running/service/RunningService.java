@@ -10,7 +10,9 @@ import run.backend.domain.running.exception.RunningException;
 import run.backend.domain.running.repository.PixelRepository;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -28,12 +30,29 @@ public class RunningService {
 
     @Transactional
     public void processRunningRoute(Long crewId, List<Coordinate> coordinates) {
-        List<Pixel> pixelsToSave = new ArrayList<>();
-
+        // 1. 좌표를 픽셀로 변환하고 매핑 정보 저장 (순서 유지)
+        Map<PixelId, Coordinate> pixelToCoordMap = new LinkedHashMap<>();
         for (Coordinate coord : coordinates) {
             int[] pixelPos = toPixel(coord.latitude(), coord.longitude());
             PixelId id = new PixelId(pixelPos[0], pixelPos[1]);
+            
+            // 같은 픽셀에 여러 좌표가 있으면 가장 최신 시간만 유지
+            Coordinate existing = pixelToCoordMap.get(id);
+            if (existing == null || coord.timestamp().isAfter(existing.timestamp())) {
+                pixelToCoordMap.put(id, coord);
+            }
+        }
 
+        // 2. 픽셀 ID를 정렬 (데드락 방지)
+        List<PixelId> sortedPixelIds = pixelToCoordMap.keySet().stream()
+                .sorted()
+                .toList();
+
+        // 3. 정렬된 순서로 락 획득 및 업데이트
+        List<Pixel> pixelsToSave = new ArrayList<>();
+        for (PixelId id : sortedPixelIds) {
+            Coordinate coord = pixelToCoordMap.get(id);
+            
             Pixel pixel = pixelRepository.findByIdWithLock(id)
                     .orElseGet(() -> new Pixel(id, crewId, coord.timestamp()));
 
