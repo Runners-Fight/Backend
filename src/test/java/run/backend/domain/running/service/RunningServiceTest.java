@@ -48,19 +48,17 @@ class RunningServiceTest {
     @Test
     @DisplayName("비관적 락 - 동시 요청 시 순차 처리로 최신 데이터만 저장")
     void pessimisticLock_concurrency_test() throws Exception {
-        // given: 서울 시청 근처 좌표 (37.5663, 126.9779)
+        // given
         int[] pixel = runningService.toPixel(37.5663, 126.9779);
         PixelId pixelId = new PixelId(pixel[0], pixel[1]);
 
-        // 초기 데이터: crew 99, 14:00
         Pixel initial = new Pixel(pixelId, 99L, LocalDateTime.of(2025, 10, 20, 14, 0));
         pixelRepository.saveAndFlush(initial);
 
-        // 같은 픽셀에 대한 두 개의 요청
         Coordinate coordA = new Coordinate(37.5663, 126.9779, LocalDateTime.of(2025, 10, 20, 15, 0));
         Coordinate coordB = new Coordinate(37.5663, 126.9779, LocalDateTime.of(2025, 10, 20, 16, 0));
 
-        // when: 두 스레드가 동시에 업데이트 시도
+        // when
         CountDownLatch latchReady = new CountDownLatch(2);
         CountDownLatch latchStart = new CountDownLatch(1);
         ExecutorService executor = Executors.newFixedThreadPool(2);
@@ -88,12 +86,12 @@ class RunningServiceTest {
         executor.submit(taskA);
         executor.submit(taskB);
 
-        latchReady.await();  // 두 스레드 준비 대기
-        latchStart.countDown();  // 동시 시작
+        latchReady.await();
+        latchStart.countDown();
         executor.shutdown();
         executor.awaitTermination(10, TimeUnit.SECONDS);
 
-        // then: 가장 최신 시간(16:00)의 crew 2가 저장되어야 함
+        // then
         Pixel result = pixelRepository.findById(pixelId).orElseThrow();
         assertThat(result.getCrewId()).isEqualTo(2L);
         assertThat(result.getUpdatedAt()).isEqualTo(LocalDateTime.of(2025, 10, 20, 16, 0));
@@ -119,13 +117,12 @@ class RunningServiceTest {
                 new Coordinate(37.5650, 126.9770, LocalDateTime.of(2025, 10, 20, 15, 4))
         );
 
-        // 초기 픽셀 데이터 생성
         for (Coordinate coord : forwardRoute) {
             int[] pixel = runningService.toPixel(coord.latitude(), coord.longitude());
             pixelRepository.saveAndFlush(new Pixel(new PixelId(pixel[0], pixel[1]), 99L, coord.timestamp()));
         }
 
-        // when: 20번 반복 (데드락 발생 확률 높임)
+        // when
         int attempts = 20;
         AtomicInteger deadlockCount = new AtomicInteger(0);
         AtomicInteger successCount = new AtomicInteger(0);
@@ -171,7 +168,7 @@ class RunningServiceTest {
             }
         }
 
-        // then: 결과 출력
+        // then
         System.out.println("성공: " + successCount.get() + "회");
         System.out.println("데드락/타임아웃: " + deadlockCount.get() + "회");
         System.out.println("데드락 발생률: " + String.format("%.1f%%", (deadlockCount.get() * 100.0 / attempts)));
@@ -192,11 +189,11 @@ class RunningServiceTest {
         Pixel existing = new Pixel(pixelId, 1L, LocalDateTime.of(2025, 10, 20, 16, 0));
         pixelRepository.saveAndFlush(existing);
 
-        // when: 더 오래된 시간으로 업데이트 시도
+        // when
         Coordinate olderCoord = new Coordinate(37.5663, 126.9779, LocalDateTime.of(2025, 10, 20, 15, 0));
         runningService.processRunningRoute(2L, List.of(olderCoord));
 
-        // then: 업데이트되지 않음
+        // then
         Pixel result = pixelRepository.findById(pixelId).orElseThrow();
         assertThat(result.getCrewId()).isEqualTo(1L);  // 기존 crew 유지
         assertThat(result.getUpdatedAt()).isEqualTo(LocalDateTime.of(2025, 10, 20, 16, 0));
