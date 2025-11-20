@@ -10,6 +10,20 @@ jobs:
   test:
     runs-on: ubuntu-22.04
 
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: test_password_1234
+          MYSQL_DATABASE: runners
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
     steps:
       - uses: actions/checkout@v4
         with:
@@ -23,6 +37,44 @@ jobs:
 
       - name: Create .env file for CI environment
         run: echo "${{ secrets.ENV_FILE_CONTENT }}" > .env
+
+      - name: Create test application.yml
+        run: |
+          mkdir -p src/test/resources
+          cat > src/test/resources/application.yml << 'EOF'
+          spring:
+            datasource:
+              url: jdbc:mysql://localhost:3306/runners?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
+              username: root
+              password: test_password_1234
+              driver-class-name: com.mysql.cj.jdbc.Driver
+
+            jpa:
+              database: mysql
+              hibernate:
+                ddl-auto: update
+              properties:
+                hibernate:
+                  dialect: org.hibernate.dialect.MySQLDialect
+                  format_sql: true
+              show-sql: true
+
+          jwt:
+            secret: test_jwt_secret_key_for_ci_testing_only_1234567890
+            access-token-expire-time: 1800000
+            refresh-token-expire-time: 1209600000
+
+          file:
+            upload:
+              dir: ${java.io.tmpdir}/test-uploads
+
+          swagger:
+            id: runners
+            pwd: runners123
+            server:
+              url:
+                prod: http://localhost:8080
+          EOF
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
